@@ -10,10 +10,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import faker from 'faker';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import Chart from "react-apexcharts";
 import './ApexChart.css';
 
 ChartJS.register(
@@ -68,8 +66,14 @@ export const options = {
         enabled: true,
         mode: 'x',
       },
-      limits: {
-        x: {min: 0, max: 100}
+      zoom: {
+        limits: {
+          x: {min: 5, max: 10},
+        },
+        wheel: {
+          enabled: true,
+        },
+        mode: 'x',
       }
     }
   },
@@ -82,6 +86,7 @@ export const options = {
 
 const labels = [];
 const colors = [];
+const decimation = 20;
 
 export const data = {
   labels,
@@ -97,58 +102,41 @@ function extractDataToDatasets() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    let data_points = json[channel].slice(0,10000);
+    console.log(json[channel].length);
+    let data_points = json[channel]
     let firstPoint = data_points[0];
     let offset = -firstPoint;
+    data_points = data_points.filter((_,i) => i % decimation == 0);
+    console.log(data_points.length);
     data_points = data_points.map(element=> (3)*element + 132000 - 12000*(i-1));
+    console.log(data_points.length);
     //data_points = data_points.map(element=> (1)*(element + offset));
-    console.log(data_points);
     datasets.push({
       label: channel,
       data: data_points,
+      borderColor: `rgb(${r}, ${g}, ${b})`,
     });
-    colors.push(`#${r.toString(16)}${g.toString(16)}${b.toString(16)}`);
   }
-  data.datasets = datasets.slice(0,10000);
-  data.labels = json['Time'].slice(0,10000);
+  data.datasets = datasets
+  data.labels = json['Time'].slice(0,data.datasets[0].data.length);
+  console.log(data.datasets[0].data.length);
 }
 
 class ApexChart extends React.Component {
   constructor(props) {
     super(props);
     extractDataToDatasets();
-    // this.state = {
-    //   options: {
-    //     chart: {
-    //       id: "basic-line"
-    //     },
-    //     colors: colors,
-    //     tooltip: {
-    //       enabled: false,
-    //     }
-    //   },
-    //   series: data.datasets,
-    // };
   }
 
   render() {
 
     return (
-      <div classNam='chartWrapper'>
-        <div className='chartAreaWrapper'>
-          <Line
-            height={'1000'}
-            width={'100'}
-            options={options}
-            data={data} />
-        </div>
-      </div>
-      // <Chart
-      //   options={this.state.options}
-      //   series={this.state.series}
-      //   type="line"
-      //   width="500"
-      // />
+      <Line
+        height={'100%'}
+        width={'100%'}
+        options={options}
+        data={data} 
+      />
     );
   }
 }
