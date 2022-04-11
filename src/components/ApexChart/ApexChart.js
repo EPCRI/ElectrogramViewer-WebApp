@@ -13,6 +13,8 @@ import { Line } from 'react-chartjs-2';
 import faker from 'faker';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import Chart from "react-apexcharts";
+import './ApexChart.css';
 
 ChartJS.register(
   CategoryScale,
@@ -53,23 +55,33 @@ const annotation3 = {
 };
 
 export const options = {
+  maintainAspectRatio: false,
   responsive: true,
   animation: false,
   spanGaps: true,
   plugins: {
-    title: {
-      display: true,
-      text: 'Chart.js Line Chart',
+    legend: {
+      display: false,
     },
+    zoom: {
+      pan: {
+        enabled: true,
+        mode: 'x',
+      },
+      limits: {
+        x: {min: 0, max: 100}
+      }
+    }
   },
   elements: {
     point: {
-        radius: 0 // default to disabled in all datasets
+        radius: 0, // default to disabled in all datasets
     }
   },
 };
 
-const labels = Array.from({length: 10000}, (_, index) => index + 1);
+const labels = [];
+const colors = [];
 
 export const data = {
   labels,
@@ -80,6 +92,7 @@ function extractDataToDatasets() {
   const datasets = [];
   const json = require('./test.json');
   for (let i = 0; i < json['Channels'].length - 1; i++) {
+  // for (let i = 0; i < 1; i++) {
     const channel = json['Channels'][i+1];
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
@@ -93,32 +106,51 @@ function extractDataToDatasets() {
     datasets.push({
       label: channel,
       data: data_points,
-      borderColor: `rgb(${r}, ${g}, ${b})`,
-      backgroundColor: `rgb(${r}, ${g}, ${b}, 0.5)`
     });
+    colors.push(`#${r.toString(16)}${g.toString(16)}${b.toString(16)}`);
   }
-  data.datasets = datasets;
+  data.datasets = datasets.slice(0,10000);
   data.labels = json['Time'].slice(0,10000);
 }
 
-class Chart extends React.Component {
+class ApexChart extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
     extractDataToDatasets();
-    
+    // this.state = {
+    //   options: {
+    //     chart: {
+    //       id: "basic-line"
+    //     },
+    //     colors: colors,
+    //     tooltip: {
+    //       enabled: false,
+    //     }
+    //   },
+    //   series: data.datasets,
+    // };
   }
 
   render() {
 
     return (
-      <div id=''>
-        <Line 
-          options={options} 
-          data={data} />
+      <div classNam='chartWrapper'>
+        <div className='chartAreaWrapper'>
+          <Line
+            height={'1000'}
+            width={'100'}
+            options={options}
+            data={data} />
+        </div>
       </div>
+      // <Chart
+      //   options={this.state.options}
+      //   series={this.state.series}
+      //   type="line"
+      //   width="500"
+      // />
     );
   }
 }
 
-export default Chart;
+export default ApexChart;
