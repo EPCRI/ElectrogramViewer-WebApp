@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart, Line } from 'react-chartjs-2';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import './ApexChart.css';
@@ -67,13 +67,13 @@ export const options = {
         mode: 'x',
       },
       zoom: {
-        limits: {
-          x: {min: 5, max: 10},
-        },
+        mode: 'x',
         wheel: {
           enabled: true,
         },
-        mode: 'x',
+        limits: {
+          x: {min: 0, max: 100}
+        }
       }
     }
   },
@@ -86,7 +86,8 @@ export const options = {
 
 const labels = [];
 const colors = [];
-const decimation = 20;
+const decimation = 10;
+const myChartRef = React.createRef();
 
 export const data = {
   labels,
@@ -102,14 +103,11 @@ function extractDataToDatasets() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    console.log(json[channel].length);
     let data_points = json[channel]
     let firstPoint = data_points[0];
     let offset = -firstPoint;
-    data_points = data_points.filter((_,i) => i % decimation == 0);
-    console.log(data_points.length);
+    data_points = data_points.filter((_,i) => i % decimation === 0);
     data_points = data_points.map(element=> (3)*element + 132000 - 12000*(i-1));
-    console.log(data_points.length);
     //data_points = data_points.map(element=> (1)*(element + offset));
     datasets.push({
       label: channel,
@@ -119,24 +117,59 @@ function extractDataToDatasets() {
   }
   data.datasets = datasets
   data.labels = json['Time'].slice(0,data.datasets[0].data.length);
-  console.log(data.datasets[0].data.length);
 }
 
 class ApexChart extends React.Component {
+  
   constructor(props) {
     super(props);
     extractDataToDatasets();
+    this.state = { zoom_value: 100};
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    let chart = myChartRef.current;
+    console.log("zoom level before: " + chart.getZoomLevel());
+    let zoomLevel = event.target.value === 'reset' ? 1 : 100/event.target.value;
+    this.setState({ zoom_value: zoomLevel});
+    console.log("Chart instance: " + chart);
+    chart.resetZoom();
+    chart.zoom(zoomLevel, 'none');
+    console.log("set zoom level: " + zoomLevel);
+    console.log("zoom level after: " + chart.getZoomLevel());
+  }
+
+  componentDidMount() {
+    console.log(myChartRef); // returns a Chart.js instance reference
   }
 
   render() {
 
     return (
-      <Line
-        height={'100%'}
-        width={'100%'}
-        options={options}
-        data={data} 
-      />
+      <div className='chart-container'>
+        <div style={{height: '100%', width: '100%'}}>
+          <Line 
+            ref={myChartRef}
+            height={"100%"} 
+            width={"100%"} 
+            options={options} 
+            data={data} />
+        </div>
+        <div className='tool-box'>
+          <select value={this.state.zoom_value} onChange={this.handleChange}>
+            <option value={30}>30</option>
+            <option value={40}>40</option>
+            <option value={50}>50</option>
+            <option value={60}>60</option>
+            <option value={70}>70</option>
+            <option value={80}>80</option>
+            <option value={90}>90</option>
+            <option value={100}>100</option>
+            <option value={'reset'}>Reset</option>
+          </select>
+        </div>
+      </div>
     );
   }
 }

@@ -1,31 +1,11 @@
-.chartWrapper {/* w w w. j a v  a2 s.co  m*/
-  position: relative;
+.chart-container {
+  min-width: 100%;
+  min-height: 100%;
+  display:flex
 }
-.chartWrapper > canvas {
+
+.tools-box {
   position: absolute;
-  left: 0;
   top: 0;
-  pointer-events:none;
-}
-.chartAreaWrapper {
-  width: 5000px;
-  height: 100%;
-  min-height: fit-content;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
-
-.app {
-  padding: 40px;
-}
-
-.row {
-  max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
+  right: 0;
 }
