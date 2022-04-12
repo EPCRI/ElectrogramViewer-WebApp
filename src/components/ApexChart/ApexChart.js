@@ -27,9 +27,12 @@ ChartJS.register(
 );
 
 const myChartRef = React.createRef();
-const labels = [];
-const decimation = 10;
-const numPointsOnChart = 400;
+let datasets = [];
+let labels = [];
+const decimation = 1;
+const numPointsOnChart = 20000 / decimation;
+let dataIdxLeft = 0;
+let dataIdxRight = numPointsOnChart;
 
 const annotation = {
   type: 'line',
@@ -55,9 +58,9 @@ const movechart = [
         const x = args.event.x;
         const y = args.event.y;
 
-        if (x >= left - 15 && x <= left + 15 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
+        if (x >= left && x <= left + 30 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
           canvas.style.cursor = 'pointer';
-        } else if (x >= right - 15 && x <= right + 15 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
+        } else if (x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
           canvas.style.cursor = 'pointer';
         } else {
           canvas.style.cursor = 'default';
@@ -97,51 +100,102 @@ const movechart = [
       }
 
       let drawCircleLeft = new CircleChevron();
-      drawCircleLeft.draw(ctx, left, 5);
+      drawCircleLeft.draw(ctx, left + 15 + 1.5, 5);
 
       let drawCircleRight = new CircleChevron();
-      drawCircleRight.draw(ctx, right, -5);
+      drawCircleRight.draw(ctx, right - 15 - 1.5, -5);
 
+      // scrollbar
+      ctx.beginPath();
+      ctx.fillStyle = 'lightgrey';
+      ctx.rect(left + 15, bottom + 60, width - 30, 15);
+      ctx.fill();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
+      ctx.rect(left, bottom + 60, 15, 15);
+      ctx.rect(right - 30, bottom + 60, 15, 15);
+      ctx.fill();
+      ctx.closePath();
+
+      // moveable bar
+      let startingPoint = left + 15 + width;
+      const barWidth = (width - 30) / (chart.config.data.datasets[0].data.length / 100);
+
+
+      ctx.beginPath();
+      ctx.fillStyle = 'black';
+      ctx.rect(left + 15, bottom + 60, barWidth, 15);
+      ctx.fill();
+      ctx.closePath();
     }
   }
 ];
 
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
-  console.log(event);
   const myChart = myChartRef.current;
   const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
-  const rect = canvas.getBoundingClientRect();
   const x = event.x;
   const y = event.y;
-  console.log(`x: ${x}  y: ${y}`);
 
-  if(x >= right - 15 && x <= right + 15 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
-    myChart.options.scales.x.min = myChart.options.scales.x.min + numPointsOnChart;
-    myChart.options.scales.x.max = myChart.options.scales.x.max + numPointsOnChart;
-    if (myChart.options.scales.x.max >= myChart.data.datasets[0].data.length) {
-      myChart.options.scales.x.min = myChart.data.datasets[0].data.length - numPointsOnChart;
-      myChart.options.scales.x.max = myChart.data.datasets[0].data.length;
+  if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
+    let lbls = myChart.config.data.labels;
+    dataIdxLeft += numPointsOnChart;
+    dataIdxRight += numPointsOnChart;
+
+    if (dataIdxRight >= datasets[0].data.length) {
+      dataIdxLeft = datasets[0].data.length - numPointsOnChart;
+      dataIdxRight = datasets[0].data.length;
+      lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+      lbls.splice(0, numPointsOnChart);
+      myChart.config.data.datasets.forEach((dataset, index) => {
+        dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+        dataset.data.splice(0, numPointsOnChart);
+      })
+    } else {
+      myChart.config.data.datasets.forEach((dataset, index) => {
+        dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+        dataset.data.splice(0, numPointsOnChart);
+        lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+        lbls.splice(0, numPointsOnChart);
+        myChart.config.data.labels = lbls;
+      })
     }
-    myChart.update();
+    myChart.update('none');
   }
 
-  if(x >= left - 15 && x <= left + 15 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
-    myChart.options.scales.x.min = myChart.options.scales.x.min - numPointsOnChart;
-    myChart.options.scales.x.max = myChart.options.scales.x.max - numPointsOnChart;
-    if (myChart.options.scales.x.max <= 0) {
-      myChart.options.scales.x.min = 0;
-      myChart.options.scales.x.max = numPointsOnChart;
+  if(x >= left && x <= left + 30 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
+    let lbls = myChart.config.data.labels;
+    dataIdxLeft -= numPointsOnChart;
+    dataIdxRight -= numPointsOnChart;
+    if (dataIdxLeft <= 0) {
+      dataIdxLeft = 0;
+      dataIdxRight = numPointsOnChart;
+      lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+      lbls.splice(0, numPointsOnChart);
+      myChart.config.data.labels = lbls;
+      myChart.config.data.datasets.forEach((dataset, index) => {
+        dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+        dataset.data.splice(0, numPointsOnChart);
+      })
+    } else {
+      myChart.config.data.datasets.forEach((dataset, index) => {
+        dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+        dataset.data.splice(0, numPointsOnChart);
+        lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+        lbls.splice(0, numPointsOnChart);
+        myChart.config.data.labels = lbls;
+      })
     }
-    myChart.update();
+    myChart.update('none');
   }
-  console.log("xmin: " + myChart.options.scales.x.min + ", xmax: " + myChart.options.scales.x.max);
+
+  console.log(`Left Index: ${dataIdxLeft}, Right Index: ${dataIdxRight}`);
+  console.log(myChart.config.data.datasets[0].data.length);
+  console.log(myChart);
 }
-
-// function moveScroll() {
-//   console.log("moveScroll()");
-//   canvas.addEventListener('click', mouseClickFunction);
-// }
 
 export const options = {
   maintainAspectRatio: false,
@@ -150,7 +204,8 @@ export const options = {
   animation: false,
   layout: {
     padding: {
-      right:18,
+      right: 18,
+      bottom: 40,
     }
   },
   scales: {
@@ -184,27 +239,33 @@ export const data = {
 };
 
 function extractDataToDatasets() {
-  const datasets = [];
   const json = require('./test.json');
+  datasets = [];
+  labels = [];
+  let sets = [];
   for (let i = 0; i < json['Channels'].length - 1; i++) {
-  // for (let i = 0; i < 1; i++) {
     const channel = json['Channels'][i+1];
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    let data_points = json[channel];
+    let data_points = json[channel]
     let firstPoint = data_points[0];
     data_points = data_points.filter((_,i) => i % decimation === 0);
     data_points = data_points.map(element=> (3)*element + 132000 - 12000*(i-1));
-    data_points = data_points.slice(0,20000);
     datasets.push({
       label: channel,
       data: data_points,
       borderColor: `rgb(${r}, ${g}, ${b})`,
     });
+    sets.push({
+      label: channel,
+      data: data_points.slice(0, numPointsOnChart),
+      borderColor: `rgb(${r}, ${g}, ${b})`,
+    });
   }
-  data.datasets = datasets;
-  data.labels = json['Time'].slice(0,data.datasets[0].data.length);
+  labels = json['Time']
+  data.datasets = sets;
+  data.labels = json['Time'].slice(0,numPointsOnChart);
 }
 
 class ApexChart extends React.Component {
