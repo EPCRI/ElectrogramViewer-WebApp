@@ -192,7 +192,8 @@ class ApexChart extends React.Component {
             ref={myChartRef}
             height={"100%"} 
             width={"100%"} 
-            options={options} 
+            options={options}
+            plugins={chartpluginsset}
             data={data} />
         </div>
         {/* <div className='tool-box'>
