@@ -52,29 +52,52 @@ const annotation3 = {
   yScaleID: 'y'
 };
 
+const movechart = {
+  id: 'movechart',
+  afterDraw(chart, args, pluginOptions) {
+    console.log("afterDraw()");
+    const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+
+    const angle = Math.PI / 180;
+
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(102, 102, 102, 0.5)';
+    ctx.fillStyle = 'white';
+    ctx.arc(left, height / 2 + top, 15, angle * 0, angle * 360, false);
+    ctx.stroke();
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+
+const chartpluginsset = [
+  {
+      afterDatasetDraw: (chart) => {
+        const  { ctx } = chart
+        console.log(ctx);
+        ctx.save()
+        ctx.beginPath()
+        ctx.moveTo(200,200)
+        ctx.lineTo(200,100)
+        ctx.lineTo(20,100)
+        ctx.fillStyle='#E24545'
+        ctx.fill()
+      }
+  }
+];
+
 export const options = {
   maintainAspectRatio: false,
   responsive: true,
-  animation: false,
   spanGaps: true,
-  plugins: {
-    legend: {
-      display: false,
+  scales: {
+    x: {
+      min: 0,
+      max: 4000,
     },
-    zoom: {
-      pan: {
-        enabled: true,
-        mode: 'x',
-      },
-      zoom: {
-        mode: 'x',
-        wheel: {
-          enabled: true,
-        },
-        limits: {
-          x: {min: 0, max: 100}
-        }
-      }
+    y: {
+      beginAtZero: true,
     }
   },
   elements: {
@@ -82,11 +105,31 @@ export const options = {
         radius: 0, // default to disabled in all datasets
     }
   },
+  plugins: {
+    chartpluginsset,
+    legend: {
+      display: false
+    },
+  }
+    // zoom: {
+    //   pan: {
+    //     enabled: true,
+    //     mode: 'x',
+    //   },
+    //   zoom: {
+    //     mode: 'x',
+    //     wheel: {
+    //       enabled: true,
+    //     },
+    //     limits: {
+    //       x: {min: 0, max: 100}
+    //     }
+    //   }
+    // },
 };
 
 const labels = [];
-const colors = [];
-const decimation = 10;
+const decimation = 1;
 const myChartRef = React.createRef();
 
 export const data = {
@@ -106,7 +149,7 @@ function extractDataToDatasets() {
     let data_points = json[channel]
     let firstPoint = data_points[0];
     let offset = -firstPoint;
-    data_points = data_points.filter((_,i) => i % decimation === 0);
+    // data_points = data_points.filter((_,i) => i % decimation === 0);
     data_points = data_points.map(element=> (3)*element + 132000 - 12000*(i-1));
     //data_points = data_points.map(element=> (1)*(element + offset));
     datasets.push({
@@ -115,7 +158,7 @@ function extractDataToDatasets() {
       borderColor: `rgb(${r}, ${g}, ${b})`,
     });
   }
-  data.datasets = datasets
+  data.datasets = datasets;
   data.labels = json['Time'].slice(0,data.datasets[0].data.length);
 }
 
@@ -124,7 +167,7 @@ class ApexChart extends React.Component {
   constructor(props) {
     super(props);
     extractDataToDatasets();
-    this.state = { zoom_value: 100};
+    this.state = { zoom_value: 100 };
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -140,10 +183,6 @@ class ApexChart extends React.Component {
     console.log("zoom level after: " + chart.getZoomLevel());
   }
 
-  componentDidMount() {
-    console.log(myChartRef); // returns a Chart.js instance reference
-  }
-
   render() {
 
     return (
@@ -156,7 +195,7 @@ class ApexChart extends React.Component {
             options={options} 
             data={data} />
         </div>
-        <div className='tool-box'>
+        {/* <div className='tool-box'>
           <select value={this.state.zoom_value} onChange={this.handleChange}>
             <option value={30}>30</option>
             <option value={40}>40</option>
@@ -168,7 +207,7 @@ class ApexChart extends React.Component {
             <option value={100}>100</option>
             <option value={'reset'}>Reset</option>
           </select>
-        </div>
+        </div> */}
       </div>
     );
   }
