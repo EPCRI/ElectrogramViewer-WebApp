@@ -281,6 +281,7 @@ function extractDataToDatasets() {
   return data;
 }
 
+
 class ApexChart extends React.Component {
   
   constructor(props) {
@@ -349,10 +350,10 @@ class ApexChart extends React.Component {
         </div>
         <div className='tool-box'>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
-            <option value={1}>X1</option>
-            <option value={2}>X2</option>
-            <option value={3}>X3</option>
-            <option value={4}>X4</option>
+            <option value={8}>400</option>
+            <option value={3.8}>200</option>
+            <option value={2}>100</option>
+            <option value={1}>67</option>
           </select>
         </div>
       </div>
