@@ -30,9 +30,13 @@ const myChartRef = React.createRef();
 let datasets = [];
 let labels = [];
 const decimation = 1;
-const numPointsOnChart = 20000 / decimation;
+const gain = 4;
+const separation = 16000;
+const maxPointsOnChart = 20000;
+let numPointsOnChart = maxPointsOnChart / decimation;
 let dataIdxLeft = 0;
 let dataIdxRight = numPointsOnChart;
+const ecgColors = ['maroon', 'black', 'red', 'blue', 'black', 'green', 'red', 'orange', 'green', 'brown', 'black', 'purple']
 
 const annotation = {
   type: 'line',
@@ -45,6 +49,12 @@ const annotation = {
   yMax: 0,
   yMin: 110,
   yScaleID: 'y'
+};
+
+
+export const data = {
+  labels,
+  datasets: [],
 };
 
 const movechart = [
@@ -79,8 +89,8 @@ const movechart = [
         // }
         draw(ctx, x1, pixel) {
           ctx.beginPath();
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = 'rgba(102, 102, 102, 0.5)';
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = 'black';
           ctx.fillStyle = 'white';
           ctx.arc(x1, height / 2 + top, 15, angle * 0, angle * 360, false);
           ctx.stroke();
@@ -90,7 +100,7 @@ const movechart = [
           // chevron Arrow Left
           ctx.beginPath();
           ctx.lineWidth = 3;
-          ctx.strokeStyle = 'rgba(255, 26, 104, 0.5)';
+          ctx.strokeStyle = 'black';
           ctx.moveTo(x1 + pixel, height / 2 + top - 7.5);
           ctx.lineTo(x1 - pixel, height / 2 + top);
           ctx.lineTo(x1 + pixel, height / 2 + top + 7.5);
@@ -106,29 +116,29 @@ const movechart = [
       drawCircleRight.draw(ctx, right - 15 - 1.5, -5);
 
       // scrollbar
-      ctx.beginPath();
-      ctx.fillStyle = 'lightgrey';
-      ctx.rect(left + 15, bottom + 60, width - 30, 15);
-      ctx.fill();
-      ctx.closePath();
+      // ctx.beginPath();
+      // ctx.fillStyle = 'lightgrey';
+      // ctx.rect(left + 15, bottom + 60, width - 30, 15);
+      // ctx.fill();
+      // ctx.closePath();
 
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
-      ctx.rect(left, bottom + 60, 15, 15);
-      ctx.rect(right - 30, bottom + 60, 15, 15);
-      ctx.fill();
-      ctx.closePath();
+      // ctx.beginPath();
+      // ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
+      // ctx.rect(left, bottom + 60, 15, 15);
+      // ctx.rect(right - 30, bottom + 60, 15, 15);
+      // ctx.fill();
+      // ctx.closePath();
 
-      // moveable bar
-      let startingPoint = left + 15 + width;
-      const barWidth = (width - 30) / (chart.config.data.datasets[0].data.length / 100);
+      // // moveable bar
+      // let startingPoint = left + 15 + width;
+      // const barWidth = (width - 30) / (chart.config.data.datasets[0].data.length / 100);
 
 
-      ctx.beginPath();
-      ctx.fillStyle = 'black';
-      ctx.rect(left + 15, bottom + 60, barWidth, 15);
-      ctx.fill();
-      ctx.closePath();
+      // ctx.beginPath();
+      // ctx.fillStyle = 'black';
+      // ctx.rect(left + 15, bottom + 60, barWidth, 15);
+      // ctx.fill();
+      // ctx.closePath();
     }
   }
 ];
@@ -139,6 +149,7 @@ function mouseClickFunction(event) {
   const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
   const x = event.x;
   const y = event.y;
+  console.log(x, ' ', y);
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
@@ -155,12 +166,13 @@ function mouseClickFunction(event) {
         dataset.data.splice(0, numPointsOnChart);
       })
     } else {
+      lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+      lbls.splice(0, numPointsOnChart);
+      myChart.config.data.labels = lbls;
+
       myChart.config.data.datasets.forEach((dataset, index) => {
         dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
         dataset.data.splice(0, numPointsOnChart);
-        lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-        lbls.splice(0, numPointsOnChart);
-        myChart.config.data.labels = lbls;
       })
     }
     myChart.update('none');
@@ -181,20 +193,19 @@ function mouseClickFunction(event) {
         dataset.data.splice(0, numPointsOnChart);
       })
     } else {
+      lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+      lbls.splice(0, numPointsOnChart);
+      myChart.config.data.labels = lbls;
+
       myChart.config.data.datasets.forEach((dataset, index) => {
         dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
         dataset.data.splice(0, numPointsOnChart);
-        lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-        lbls.splice(0, numPointsOnChart);
-        myChart.config.data.labels = lbls;
-      })
+      });
     }
     myChart.update('none');
   }
 
   console.log(`Left Index: ${dataIdxLeft}, Right Index: ${dataIdxRight}`);
-  console.log(myChart.config.data.datasets[0].data.length);
-  console.log(myChart);
 }
 
 export const options = {
@@ -214,12 +225,18 @@ export const options = {
       max: numPointsOnChart,
     },
     y: {
+      min: -5000,
+      max: 205000,
+      display: false,
       beginAtZero: true,
     }
   },
   elements: {
     point: {
         radius: 0, // default to disabled in all datasets
+    },
+    line: {
+      borderWidth: 1.2,
     }
   },
   plugins: {
@@ -231,11 +248,6 @@ export const options = {
   onClick: function (evt, element) {
     mouseClickFunction(evt);
   }
-};
-
-export const data = {
-  labels,
-  datasets: [],
 };
 
 function extractDataToDatasets() {
@@ -251,21 +263,22 @@ function extractDataToDatasets() {
     let data_points = json[channel]
     let firstPoint = data_points[0];
     data_points = data_points.filter((_,i) => i % decimation === 0);
-    data_points = data_points.map(element=> (3)*element + 132000 - 12000*(i-1));
+    data_points = data_points.map(element=> (gain)*element + separation*(json['Channels'].length-2) - separation*(i-1));
     datasets.push({
       label: channel,
       data: data_points,
-      borderColor: `rgb(${r}, ${g}, ${b})`,
+      borderColor: ecgColors[i],
     });
     sets.push({
       label: channel,
       data: data_points.slice(0, numPointsOnChart),
-      borderColor: `rgb(${r}, ${g}, ${b})`,
+      borderColor: ecgColors[i],
     });
   }
   labels = json['Time']
   data.datasets = sets;
   data.labels = json['Time'].slice(0,numPointsOnChart);
+  return data;
 }
 
 class ApexChart extends React.Component {
@@ -273,20 +286,52 @@ class ApexChart extends React.Component {
   constructor(props) {
     super(props);
     extractDataToDatasets();
-    this.state = { zoom_value: 100 };
-    this.handleChange = this.handleChange.bind(this);
+    this.state = { zoom_value: 1 };
+    this.handleZoomChange = this.handleZoomChange.bind(this);
   }
 
-  handleChange(event) {
-    let chart = myChartRef.current;
-    console.log("zoom level before: " + chart.getZoomLevel());
-    let zoomLevel = event.target.value === 'reset' ? 1 : 100/event.target.value;
-    this.setState({ zoom_value: zoomLevel});
-    console.log("Chart instance: " + chart);
-    chart.resetZoom();
-    chart.zoom(zoomLevel, 'none');
-    console.log("set zoom level: " + zoomLevel);
-    console.log("zoom level after: " + chart.getZoomLevel());
+  handleZoomChange(event) {
+    const chart = myChartRef.current;
+    const zoomLevel = event.target.value;
+    const config = chart.config;
+
+    this.setState({ zoom_value: zoomLevel });
+    numPointsOnChart = maxPointsOnChart / zoomLevel;
+    
+    // get new dataset 0 index array based on center of current window
+    // result: zoom in is centered on currently viewed data
+    console.log(config.data.labels.length / 2)
+    const zoomInTime =config.data.labels[Math.floor(config.data.labels.length / 2)];
+    console.log(`zoomInTime: ${zoomInTime}`);
+    for (let i = 0; i < labels.length; i++) {
+      // console.log(labels[i] + ' > ' + zoomInTime)
+      if (labels[i] > zoomInTime) {
+        if (i >= numPointsOnChart/2) {
+          console.log('1');
+          dataIdxLeft = i - numPointsOnChart/2;
+        } else {
+          console.log('2');
+          dataIdxLeft = 0;
+        }
+        break;
+      }
+    }
+
+    dataIdxRight = dataIdxLeft + numPointsOnChart;
+    config.data = extractDataToDatasets();
+
+    let lbls = config.data.labels;
+    console.log(`startIdx: ${dataIdxLeft}, endIdx: ${dataIdxRight}`);
+    lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
+    lbls.splice(0, numPointsOnChart);
+    console.log(lbls.length);
+    config.data.labels = lbls;
+
+    config.data.datasets.forEach((dataset, index) => {
+      dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+      dataset.data.splice(0, numPointsOnChart);
+    });
+    chart.update('none');
   }
 
   render() {
@@ -302,19 +347,14 @@ class ApexChart extends React.Component {
             plugins={movechart}
             data={data} />
         </div>
-        {/* <div className='tool-box'>
-          <select value={this.state.zoom_value} onChange={this.handleChange}>
-            <option value={30}>30</option>
-            <option value={40}>40</option>
-            <option value={50}>50</option>
-            <option value={60}>60</option>
-            <option value={70}>70</option>
-            <option value={80}>80</option>
-            <option value={90}>90</option>
-            <option value={100}>100</option>
-            <option value={'reset'}>Reset</option>
+        <div className='tool-box'>
+          <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
+            <option value={1}>X1</option>
+            <option value={2}>X2</option>
+            <option value={3}>X3</option>
+            <option value={4}>X4</option>
           </select>
-        </div> */}
+        </div>
       </div>
     );
   }
