@@ -11,7 +11,7 @@ import {
 } from 'chart.js';
 import { Chart, Line } from 'react-chartjs-2';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import annotationLinePlugin from '../../plugins/annotationline';
 import './ApexChart.css';
 
 ChartJS.register(
@@ -23,7 +23,7 @@ ChartJS.register(
   Tooltip,
   Legend,
   zoomPlugin,
-  annotationPlugin
+  annotationLinePlugin
 );
 
 const myChartRef = React.createRef();
@@ -64,6 +64,20 @@ const movechart = [
     afterEvent(chart, args) {
       const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = chart;
 
+      class AnnotationLine {
+
+        draw(ctx, x1) {
+          ctx.beginPath();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'red';
+          ctx.moveTo(x1, top);
+          ctx.lineTo(x1, bottom);
+          ctx.stroke();
+          ctx.closePath();
+        }
+
+      }
+
       canvas.addEventListener('mousemove', (event) => {
         const x = args.event.x;
         const y = args.event.y;
@@ -75,6 +89,12 @@ const movechart = [
         } else {
           canvas.style.cursor = 'default';
         }
+
+        // if (x >= left + 30 && x <= right - 30) {
+        //   myChartRef.current.update();
+        //   let annotation = new AnnotationLine();
+        //   annotation.draw(ctx, x);
+        // }
       });
     },
 
@@ -84,9 +104,7 @@ const movechart = [
       const angle = Math.PI / 180;
   
       class CircleChevron {
-        // constructor(x1,y1) {
 
-        // }
         draw(ctx, x1, pixel) {
           ctx.beginPath();
           ctx.lineWidth = 5;
@@ -97,7 +115,7 @@ const movechart = [
           ctx.fill();
           ctx.closePath();
     
-          // chevron Arrow Left
+          // chevron Arrow
           ctx.beginPath();
           ctx.lineWidth = 3;
           ctx.strokeStyle = 'black';
@@ -116,29 +134,33 @@ const movechart = [
       drawCircleRight.draw(ctx, right - 15 - 1.5, -5);
 
       // scrollbar
-      // ctx.beginPath();
-      // ctx.fillStyle = 'lightgrey';
-      // ctx.rect(left + 15, bottom + 60, width - 30, 15);
-      // ctx.fill();
-      // ctx.closePath();
+      ctx.beginPath();
+      ctx.fillStyle = 'lightgrey';
+      ctx.rect(left + 15, bottom + 60, width - 30, 15);
+      ctx.fill();
+      ctx.closePath();
 
-      // ctx.beginPath();
-      // ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
-      // ctx.rect(left, bottom + 60, 15, 15);
-      // ctx.rect(right - 30, bottom + 60, 15, 15);
-      // ctx.fill();
-      // ctx.closePath();
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
+      ctx.rect(left, bottom + 60, 15, 15);
+      ctx.rect(right - 30, bottom + 60, 15, 15);
+      ctx.fill();
+      ctx.closePath();
 
-      // // moveable bar
-      // let startingPoint = left + 15 + width;
-      // const barWidth = (width - 30) / (chart.config.data.datasets[0].data.length / 100);
+      // moveable bar
+      const min = dataIdxLeft;
+      let startingPoint = left + 15 + width / datasets[0].data.length * min;
+      const barWidth = (width - 30) / datasets[0].data.length * numPointsOnChart;
+      const totalWidth = startingPoint + barWidth;
+      if (totalWidth > width) {
+        startingPoint = right - 30 - barWidth;
+      }
 
-
-      // ctx.beginPath();
-      // ctx.fillStyle = 'black';
-      // ctx.rect(left + 15, bottom + 60, barWidth, 15);
-      // ctx.fill();
-      // ctx.closePath();
+      ctx.beginPath();
+      ctx.fillStyle = 'black'; 
+      ctx.rect(startingPoint, bottom + 60, barWidth, 15);
+      ctx.fill();
+      ctx.closePath();
     }
   }
 ];
@@ -240,10 +262,16 @@ export const options = {
     }
   },
   plugins: {
-    movechart,
     legend: {
       display: false
     },
+    corsair: {
+      horizontal: false,
+      vertical: true,
+      color: 'red',
+      dash: [],
+      width: 1,
+    }
   },
   onClick: function (evt, element) {
     mouseClickFunction(evt);
