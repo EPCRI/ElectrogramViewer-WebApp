@@ -26,9 +26,6 @@ ChartJS.register(
   annotationLinePlugin
 );
 
-const myChartRef = React.createRef();
-let datasets = [];
-let labels = [];
 const decimation = 1;
 const gain = 4;
 const separation = 16000;
@@ -36,24 +33,13 @@ const maxPointsOnChart = 20000;
 let numPointsOnChart = maxPointsOnChart / decimation;
 let dataIdxLeft = 0;
 let dataIdxRight = numPointsOnChart;
-const ecgColors = ['maroon', 'black', 'red', 'blue', 'black', 'green', 'red', 'orange', 'green', 'brown', 'black', 'purple']
 
-const annotation = {
-  type: 'line',
-  borderColor: 'green',
-  borderDash: [6, 6],
-  borderWidth: 1,
-  xMax: 8,
-  xMin: 8,
-  xScaleID: 'x',
-  yMax: 0,
-  yMin: 110,
-  yScaleID: 'y'
-};
+
+const annotations = [];
 
 
 export const data = {
-  labels,
+  labels: [],
   datasets: [],
 };
 
@@ -89,17 +75,12 @@ const movechart = [
         } else {
           canvas.style.cursor = 'default';
         }
-
-        // if (x >= left + 30 && x <= right - 30) {
-        //   myChartRef.current.update();
-        //   let annotation = new AnnotationLine();
-        //   annotation.draw(ctx, x);
-        // }
       });
     },
 
     afterDraw(chart, args, pluginOptions) {
       const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+      const datasets = chart.config.options.completeDataset.datasets;
   
       const angle = Math.PI / 180;
   
@@ -149,8 +130,8 @@ const movechart = [
 
       // moveable bar
       const min = dataIdxLeft;
-      let startingPoint = left + 15 + width / datasets[0].data.length * min;
-      const barWidth = (width - 30) / datasets[0].data.length * numPointsOnChart;
+      let startingPoint = left + 15 + width / chart.config.options.completeDataset.datasets[0].data.length * min;
+      const barWidth = (width - 30) / chart.config.options.completeDataset.datasets[0].data.length * numPointsOnChart;
       const totalWidth = startingPoint + barWidth;
       if (totalWidth > width) {
         startingPoint = right - 30 - barWidth;
@@ -167,11 +148,29 @@ const movechart = [
 
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
-  const myChart = myChartRef.current;
-  const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
+  scrollButtonCheck(event);
+}
+
+function annotationCheck(event) {
   const x = event.x;
   const y = event.y;
-  console.log(x, ' ', y);
+  const myChart = event.chart;
+  const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
+
+  // if (x >= left + 30 && x <= right - 30) {
+  //   myChartRef.current.update();
+  //   let annotation = new AnnotationLine();
+  //   annotation.draw(ctx, x);
+  // }
+}
+
+function scrollButtonCheck(event) {
+  const x = event.x;
+  const y = event.y;
+  const myChart = event.chart;
+  const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
+  const datasets = myChart.config.options.completeDataset.datasets;
+  const labels = myChart.config.options.completeDataset.labels;
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
@@ -235,6 +234,24 @@ export const options = {
   responsive: true,
   spanGaps: true,
   animation: false,
+  interaction: {
+  },
+  ecgColors: ['maroon', 'black', 'red', 'blue', 'black', 'green', 'red', 'orange', 'green', 'brown', 'black', 'purple'],
+  completeDataset: {
+    datasets: [],
+    labels: [],
+  },
+  electrogramParams: {
+    decimation: 1,
+    gain: 4,
+    separation: 16000,
+    maxPointsOnChar: 20000,
+    dataIdxLeft: 0,
+    dataIdxRight: 20000,
+    get numPointsOnChart() {
+      return this.maxPointsOnChart / this.decimation;
+    },
+  },
   layout: {
     padding: {
       right: 18,
@@ -245,6 +262,10 @@ export const options = {
     x: {
       min: 0,
       max: numPointsOnChart,
+      ticks: {
+        autoSkip: true,
+        maxTicksLimit: 40,
+      },
     },
     y: {
       min: -5000,
@@ -266,6 +287,7 @@ export const options = {
       display: false
     },
     corsair: {
+      annotations: [],
       horizontal: false,
       vertical: true,
       color: 'red',
@@ -280,8 +302,8 @@ export const options = {
 
 function extractDataToDatasets() {
   const json = require('./test.json');
-  datasets = [];
-  labels = [];
+  options.completeDataset.datasets = [];
+  options.completeDataset.labels = [];
   let sets = [];
   for (let i = 0; i < json['Channels'].length - 1; i++) {
     const channel = json['Channels'][i+1];
@@ -290,20 +312,20 @@ function extractDataToDatasets() {
     const b = Math.floor(Math.random() * 256);
     let data_points = json[channel]
     let firstPoint = data_points[0];
-    data_points = data_points.filter((_,i) => i % decimation === 0);
+    data_points = data_points.filter((_,i) => i % options.electrogramParams.decimation === 0);
     data_points = data_points.map(element=> (gain)*element + separation*(json['Channels'].length-2) - separation*(i-1));
-    datasets.push({
+    options.completeDataset.datasets.push({
       label: channel,
       data: data_points,
-      borderColor: ecgColors[i],
+      borderColor: options.ecgColors[i],
     });
     sets.push({
       label: channel,
       data: data_points.slice(0, numPointsOnChart),
-      borderColor: ecgColors[i],
+      borderColor: options.ecgColors[i],
     });
   }
-  labels = json['Time']
+  options.completeDataset.labels = json['Time'];
   data.datasets = sets;
   data.labels = json['Time'].slice(0,numPointsOnChart);
   return data;
@@ -315,14 +337,16 @@ class ApexChart extends React.Component {
   constructor(props) {
     super(props);
     extractDataToDatasets();
+    this.myChartRef = React.createRef();
     this.state = { zoom_value: 1 };
     this.handleZoomChange = this.handleZoomChange.bind(this);
   }
 
   handleZoomChange(event) {
-    const chart = myChartRef.current;
+    console.log(event);
     const zoomLevel = event.target.value;
-    const config = chart.config;
+    const config = this.myChartRef.current.config;
+    const labels = options.completeDataset.labels;
 
     this.setState({ zoom_value: zoomLevel });
     numPointsOnChart = maxPointsOnChart / zoomLevel;
@@ -357,10 +381,10 @@ class ApexChart extends React.Component {
     config.data.labels = lbls;
 
     config.data.datasets.forEach((dataset, index) => {
-      dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
+      dataset.data = dataset.data.concat(options.completeDataset.datasets[index].data.slice(dataIdxLeft, dataIdxRight));
       dataset.data.splice(0, numPointsOnChart);
     });
-    chart.update('none');
+    this.myChartRef.current.update('none');
   }
 
   render() {
@@ -369,12 +393,12 @@ class ApexChart extends React.Component {
       <div className='chart-container'>
         <div style={{height: '100%', width: '100%'}}>
           <Line 
-            ref={myChartRef}
+            ref={this.myChartRef}
             height={"100%"} 
             width={"100%"} 
             options={options}
             plugins={movechart}
-            data={data} />
+            data={extractDataToDatasets(options)} />
         </div>
         <div className='tool-box'>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
