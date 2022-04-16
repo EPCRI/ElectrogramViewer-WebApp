@@ -12,6 +12,8 @@ import {
 import { Chart, Line } from 'react-chartjs-2';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationLinePlugin from '../../plugins/annotationline';
+import annotationPlugin from 'chartjs-plugin-annotation';
+import movechart from '../../plugins/movechart';
 import './ApexChart.css';
 
 ChartJS.register(
@@ -23,132 +25,33 @@ ChartJS.register(
   Tooltip,
   Legend,
   zoomPlugin,
-  annotationLinePlugin
+  annotationLinePlugin,
+  // annotationPlugin,
 );
-
-const decimation = 1;
-const gain = 4;
-const separation = 16000;
-const maxPointsOnChart = 20000;
-let numPointsOnChart = maxPointsOnChart / decimation;
-let dataIdxLeft = 0;
-let dataIdxRight = numPointsOnChart;
-
-
-const annotations = [];
-
 
 export const data = {
   labels: [],
   datasets: [],
 };
 
-const movechart = [
-  {
-    id: 'movechart',
+const annotation = {
+  type: 'line',
+  borderColor: 'green',
+  borderDash: [6, 6],
+  borderWidth: 1,
+  xMax: 300,
+  xMin: 300,
+  xScaleID: 'x',
+  yMax: 0,
+  yMin: 300,
+  yScaleID: 'y'
+};
 
-    afterEvent(chart, args) {
-      const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = chart;
-
-      class AnnotationLine {
-
-        draw(ctx, x1) {
-          ctx.beginPath();
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = 'red';
-          ctx.moveTo(x1, top);
-          ctx.lineTo(x1, bottom);
-          ctx.stroke();
-          ctx.closePath();
-        }
-
-      }
-
-      canvas.addEventListener('mousemove', (event) => {
-        const x = args.event.x;
-        const y = args.event.y;
-
-        if (x >= left && x <= left + 30 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
-          canvas.style.cursor = 'pointer';
-        } else if (x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
-          canvas.style.cursor = 'pointer';
-        } else {
-          canvas.style.cursor = 'default';
-        }
-      });
-    },
-
-    afterDraw(chart, args, pluginOptions) {
-      const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
-      const datasets = chart.config.options.completeDataset.datasets;
-  
-      const angle = Math.PI / 180;
-  
-      class CircleChevron {
-
-        draw(ctx, x1, pixel) {
-          ctx.beginPath();
-          ctx.lineWidth = 5;
-          ctx.strokeStyle = 'black';
-          ctx.fillStyle = 'white';
-          ctx.arc(x1, height / 2 + top, 15, angle * 0, angle * 360, false);
-          ctx.stroke();
-          ctx.fill();
-          ctx.closePath();
-    
-          // chevron Arrow
-          ctx.beginPath();
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = 'black';
-          ctx.moveTo(x1 + pixel, height / 2 + top - 7.5);
-          ctx.lineTo(x1 - pixel, height / 2 + top);
-          ctx.lineTo(x1 + pixel, height / 2 + top + 7.5);
-          ctx.stroke();
-          ctx.closePath();
-        }
-      }
-
-      let drawCircleLeft = new CircleChevron();
-      drawCircleLeft.draw(ctx, left + 15 + 1.5, 5);
-
-      let drawCircleRight = new CircleChevron();
-      drawCircleRight.draw(ctx, right - 15 - 1.5, -5);
-
-      // scrollbar
-      ctx.beginPath();
-      ctx.fillStyle = 'lightgrey';
-      ctx.rect(left + 15, bottom + 60, width - 30, 15);
-      ctx.fill();
-      ctx.closePath();
-
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
-      ctx.rect(left, bottom + 60, 15, 15);
-      ctx.rect(right - 30, bottom + 60, 15, 15);
-      ctx.fill();
-      ctx.closePath();
-
-      // moveable bar
-      const min = dataIdxLeft;
-      let startingPoint = left + 15 + width / chart.config.options.completeDataset.datasets[0].data.length * min;
-      const barWidth = (width - 30) / chart.config.options.completeDataset.datasets[0].data.length * numPointsOnChart;
-      const totalWidth = startingPoint + barWidth;
-      if (totalWidth > width) {
-        startingPoint = right - 30 - barWidth;
-      }
-
-      ctx.beginPath();
-      ctx.fillStyle = 'black'; 
-      ctx.rect(startingPoint, bottom + 60, barWidth, 15);
-      ctx.fill();
-      ctx.closePath();
-    }
-  }
-];
 
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
   scrollButtonCheck(event);
+  annotationCheck(event);
 }
 
 function annotationCheck(event) {
@@ -157,11 +60,10 @@ function annotationCheck(event) {
   const myChart = event.chart;
   const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
 
-  // if (x >= left + 30 && x <= right - 30) {
-  //   myChartRef.current.update();
-  //   let annotation = new AnnotationLine();
-  //   annotation.draw(ctx, x);
-  // }
+  if (x >= left + 30 && x <= right - 30) {
+    // let annotation = new AnnotationLine();
+    // annotation.draw(event);
+  }
 }
 
 function scrollButtonCheck(event) {
@@ -171,11 +73,15 @@ function scrollButtonCheck(event) {
   const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
   const datasets = myChart.config.options.completeDataset.datasets;
   const labels = myChart.config.options.completeDataset.labels;
+  const numPointsOnChart = myChart.config.options.electrogramParams.numPointsOnChart;
+
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
-    dataIdxLeft += numPointsOnChart;
-    dataIdxRight += numPointsOnChart;
+    myChart.config.options.electrogramParams.dataIdxLeft += numPointsOnChart;
+    myChart.config.options.electrogramParams.dataIdxRight += numPointsOnChart;
+    let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
+    let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
 
     if (dataIdxRight >= datasets[0].data.length) {
       dataIdxLeft = datasets[0].data.length - numPointsOnChart;
@@ -201,8 +107,10 @@ function scrollButtonCheck(event) {
 
   if(x >= left && x <= left + 30 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
-    dataIdxLeft -= numPointsOnChart;
-    dataIdxRight -= numPointsOnChart;
+    myChart.config.options.electrogramParams.dataIdxLeft -= numPointsOnChart;
+    myChart.config.options.electrogramParams.dataIdxRight -= numPointsOnChart;
+    let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
+    let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
     if (dataIdxLeft <= 0) {
       dataIdxLeft = 0;
       dataIdxRight = numPointsOnChart;
@@ -226,7 +134,7 @@ function scrollButtonCheck(event) {
     myChart.update('none');
   }
 
-  console.log(`Left Index: ${dataIdxLeft}, Right Index: ${dataIdxRight}`);
+  console.log(`Left Index: ${myChart.config.options.electrogramParams.dataIdxLeft}, Right Index: ${myChart.config.options.electrogramParams.dataIdxRight}`);
 }
 
 export const options = {
@@ -245,12 +153,10 @@ export const options = {
     decimation: 1,
     gain: 4,
     separation: 16000,
-    maxPointsOnChar: 20000,
+    maxPointsOnChart: 20000,
     dataIdxLeft: 0,
     dataIdxRight: 20000,
-    get numPointsOnChart() {
-      return this.maxPointsOnChart / this.decimation;
-    },
+    numPointsOnChart: 20000,
   },
   layout: {
     padding: {
@@ -261,7 +167,7 @@ export const options = {
   scales: {
     x: {
       min: 0,
-      max: numPointsOnChart,
+      max: 20000,
       ticks: {
         autoSkip: true,
         maxTicksLimit: 40,
@@ -293,6 +199,9 @@ export const options = {
       color: 'red',
       dash: [],
       width: 1,
+    },
+    annotation: {
+      annotations: [],
     }
   },
   onClick: function (evt, element) {
@@ -302,6 +211,7 @@ export const options = {
 
 function extractDataToDatasets() {
   const json = require('./test.json');
+  const ecgParams = options.electrogramParams;
   options.completeDataset.datasets = [];
   options.completeDataset.labels = [];
   let sets = [];
@@ -312,8 +222,8 @@ function extractDataToDatasets() {
     const b = Math.floor(Math.random() * 256);
     let data_points = json[channel]
     let firstPoint = data_points[0];
-    data_points = data_points.filter((_,i) => i % options.electrogramParams.decimation === 0);
-    data_points = data_points.map(element=> (gain)*element + separation*(json['Channels'].length-2) - separation*(i-1));
+    data_points = data_points.filter((_,i) => i % ecgParams.decimation === 0);
+    data_points = data_points.map(element=> (ecgParams.gain)*element + ecgParams.separation*(json['Channels'].length-2) - ecgParams.separation*(i-1));
     options.completeDataset.datasets.push({
       label: channel,
       data: data_points,
@@ -321,13 +231,13 @@ function extractDataToDatasets() {
     });
     sets.push({
       label: channel,
-      data: data_points.slice(0, numPointsOnChart),
+      data: data_points.slice(0, ecgParams.numPointsOnChart),
       borderColor: options.ecgColors[i],
     });
   }
   options.completeDataset.labels = json['Time'];
   data.datasets = sets;
-  data.labels = json['Time'].slice(0,numPointsOnChart);
+  data.labels = json['Time'].slice(0, ecgParams.numPointsOnChart);
   return data;
 }
 
@@ -347,9 +257,13 @@ class ApexChart extends React.Component {
     const zoomLevel = event.target.value;
     const config = this.myChartRef.current.config;
     const labels = options.completeDataset.labels;
+    const ecgParams = this.myChartRef.current.config.options.electrogramParams;
+    let dataIdxLeft = ecgParams.dataIdxLeft;
+    let dataIdxRight = ecgParams.dataIdxRight;
 
     this.setState({ zoom_value: zoomLevel });
-    numPointsOnChart = maxPointsOnChart / zoomLevel;
+    const newNumPoints = ecgParams.maxPointsOnChart / zoomLevel;
+    ecgParams.numPointsOnChart = newNumPoints;
     
     // get new dataset 0 index array based on center of current window
     // result: zoom in is centered on currently viewed data
@@ -359,9 +273,9 @@ class ApexChart extends React.Component {
     for (let i = 0; i < labels.length; i++) {
       // console.log(labels[i] + ' > ' + zoomInTime)
       if (labels[i] > zoomInTime) {
-        if (i >= numPointsOnChart/2) {
+        if (i >= newNumPoints/2) {
           console.log('1');
-          dataIdxLeft = i - numPointsOnChart/2;
+          dataIdxLeft = i - newNumPoints/2;
         } else {
           console.log('2');
           dataIdxLeft = 0;
@@ -370,19 +284,20 @@ class ApexChart extends React.Component {
       }
     }
 
-    dataIdxRight = dataIdxLeft + numPointsOnChart;
+    dataIdxRight = dataIdxLeft + newNumPoints;
     config.data = extractDataToDatasets();
 
     let lbls = config.data.labels;
     console.log(`startIdx: ${dataIdxLeft}, endIdx: ${dataIdxRight}`);
     lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-    lbls.splice(0, numPointsOnChart);
+    lbls.splice(0, newNumPoints);
     console.log(lbls.length);
     config.data.labels = lbls;
-
+    ecgParams.dataIdxLeft = dataIdxLeft;
+    ecgParams.dataIdxRight = dataIdxRight;
     config.data.datasets.forEach((dataset, index) => {
       dataset.data = dataset.data.concat(options.completeDataset.datasets[index].data.slice(dataIdxLeft, dataIdxRight));
-      dataset.data.splice(0, numPointsOnChart);
+      dataset.data.splice(0, newNumPoints);
     });
     this.myChartRef.current.update('none');
   }
@@ -397,7 +312,7 @@ class ApexChart extends React.Component {
             height={"100%"} 
             width={"100%"} 
             options={options}
-            plugins={movechart}
+            plugins={[movechart,annotationLinePlugin]}
             data={extractDataToDatasets(options)} />
         </div>
         <div className='tool-box'>
