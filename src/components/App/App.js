@@ -12,7 +12,7 @@ class App extends React.Component {
   render(){
     return (
       <div className="App">
-        <h1>EPCRI Elecrogram Annotation Web App</h1>
+        <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI />
         <ChartWindow />
       </div>

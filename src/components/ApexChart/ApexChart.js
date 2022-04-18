@@ -60,14 +60,14 @@ function scrollButtonCheck(event) {
   const datasets = myChart.config.options.completeDataset.datasets;
   const labels = myChart.config.options.completeDataset.labels;
   const numPointsOnChart = myChart.config.options.electrogramParams.numPointsOnChart;
+  let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
+  let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
 
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
-    myChart.config.options.electrogramParams.dataIdxLeft += numPointsOnChart;
-    myChart.config.options.electrogramParams.dataIdxRight += numPointsOnChart;
-    let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
-    let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
+    dataIdxLeft += numPointsOnChart;
+    dataIdxRight += numPointsOnChart;
 
     if (dataIdxRight >= datasets[0].data.length) {
       dataIdxLeft = datasets[0].data.length - numPointsOnChart;
@@ -88,15 +88,12 @@ function scrollButtonCheck(event) {
         dataset.data.splice(0, numPointsOnChart);
       })
     }
-    myChart.update('none');
   }
 
   if(x >= left && x <= left + 30 && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
-    myChart.config.options.electrogramParams.dataIdxLeft -= numPointsOnChart;
-    myChart.config.options.electrogramParams.dataIdxRight -= numPointsOnChart;
-    let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
-    let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
+    dataIdxLeft -= numPointsOnChart;
+    dataIdxRight -= numPointsOnChart;
     if (dataIdxLeft <= 0) {
       dataIdxLeft = 0;
       dataIdxRight = numPointsOnChart;
@@ -117,9 +114,13 @@ function scrollButtonCheck(event) {
         dataset.data.splice(0, numPointsOnChart);
       });
     }
-    myChart.update('none');
   }
-
+  console.log(`HERE: dataIdxLeft: ${dataIdxLeft}, dataIdxRight: ${dataIdxRight}`);
+  myChart.config.options.electrogramParams.dataIdxLeft = dataIdxLeft;
+  myChart.config.options.electrogramParams.dataIdxRight = dataIdxRight;
+  console.log(event.chart);
+  myChart.update('none');
+  console.log(myChart.chartArea.width);
   // console.log(`Left Index: ${myChart.config.options.electrogramParams.dataIdxLeft}, Right Index: ${myChart.config.options.electrogramParams.dataIdxRight}`);
 }
 
@@ -193,19 +194,16 @@ export const options = {
   }
 };
 
-function extractDataToDatasets() {
-  const json = require('./test.json');
+// Function to prepare signal channel data arrays with all json extracted data
+function extractAllDataToDatasets() {
+  const json = require('./Animal01_12_AVD_120_VVD_0_IVD_0_x1_90bpm.json');
   const ecgParams = options.electrogramParams;
   options.completeDataset.datasets = [];
   options.completeDataset.labels = [];
   let sets = [];
   for (let i = 0; i < json['Channels'].length - 1; i++) {
     const channel = json['Channels'][i+1];
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
     let data_points = json[channel]
-    let firstPoint = data_points[0];
     data_points = data_points.filter((_,i) => i % ecgParams.decimation === 0);
     data_points = data_points.map(element=> (ecgParams.gain)*element + ecgParams.separation*(json['Channels'].length-2) - ecgParams.separation*(i-1));
     options.completeDataset.datasets.push({
@@ -215,13 +213,35 @@ function extractDataToDatasets() {
     });
     sets.push({
       label: channel,
-      data: data_points.slice(0, ecgParams.numPointsOnChart),
+      data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
       borderColor: options.ecgColors[i],
     });
   }
   options.completeDataset.labels = json['Time'];
   data.datasets = sets;
-  data.labels = json['Time'].slice(0, ecgParams.numPointsOnChart);
+  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight);
+  return data;
+}
+
+// Function to prepare 
+function extractDataToDatasets() {
+  const json = require('./Animal01_12_AVD_120_VVD_0_IVD_0_x1_90bpm.json');
+  const ecgParams = options.electrogramParams;
+  let sets = [];
+  for (let i = 0; i < json['Channels'].length - 1; i++) {
+    const channel = json['Channels'][i+1];
+    let data_points = json[channel]
+    data_points = data_points.filter((_,i) => i % ecgParams.decimation === 0);
+    data_points = data_points.map(element=> (ecgParams.gain)*element + ecgParams.separation*(json['Channels'].length-2) - ecgParams.separation*(i-1));
+    sets.push({
+      label: channel,
+      data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
+      borderColor: options.ecgColors[i],
+    });
+  }
+  options.completeDataset.labels = json['Time'];
+  data.datasets = sets;
+  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight);
   return data;
 }
 
@@ -230,7 +250,7 @@ class ApexChart extends React.Component {
   
   constructor(props) {
     super(props);
-    extractDataToDatasets();
+    extractAllDataToDatasets();
     this.myChartRef = React.createRef();
     this.state = { 
       zoom_value: 1,
@@ -254,17 +274,16 @@ class ApexChart extends React.Component {
     
     // get new dataset 0 index array based on center of current window
     // result: zoom in is centered on currently viewed data
-    console.log(config.data.labels.length / 2)
-    const zoomInTime =config.data.labels[Math.floor(config.data.labels.length / 2)];
+    const zoomInTime = config.data.labels[Math.floor(config.data.labels.length / 2)];
     console.log(`zoomInTime: ${zoomInTime}`);
     for (let i = 0; i < labels.length; i++) {
-      // console.log(labels[i] + ' > ' + zoomInTime)
       if (labels[i] > zoomInTime) {
         if (i >= newNumPoints/2) {
-          console.log('1');
-          dataIdxLeft = i - newNumPoints/2;
+          // case where zoom in/out doesn't result in negative left side
+          console.log(i);
+          dataIdxLeft = Math.round(i - newNumPoints/2);
         } else {
-          console.log('2');
+          // case where it does
           dataIdxLeft = 0;
         }
         break;
@@ -286,6 +305,7 @@ class ApexChart extends React.Component {
       dataset.data = dataset.data.concat(options.completeDataset.datasets[index].data.slice(dataIdxLeft, dataIdxRight));
       dataset.data.splice(0, newNumPoints);
     });
+    
     this.myChartRef.current.update('none');
   }
 
@@ -300,7 +320,7 @@ class ApexChart extends React.Component {
             width={"100%"} 
             options={options}
             plugins={annotationLinePlugin}
-            data={extractDataToDatasets(options)} />
+            data={extractAllDataToDatasets(options)} />
         </div>
         <div className='tools-box'>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
@@ -317,12 +337,20 @@ class ApexChart extends React.Component {
           <button className='select-buttons'>T2</button>
           <div>
             <button className='confirm-buttons' onClick={() => {
-            this.myChartRef.current.config.options.plugins.corsair.annotating = false;
-            console.log(this.myChartRef.current.config.options.plugins.corsair);
+              const corsair = this.myChartRef.current.config.options.plugins.corsair;
+              corsair.annotating = false;
+              corsair.drawingLine = false;
+              console.log(this.myChartRef.current.config.options.plugins.corsair);
             }}>✓</button>
             <button className='confirm-buttons'onClick={() => {
-            this.myChartRef.current.config.options.plugins.corsair.annotating = false;
-            console.log(this.myChartRef.current.config.options.plugins.corsair);
+              const corsair = this.myChartRef.current.config.options.plugins.corsair;
+              if (corsair.drawingLine) {
+                corsair.annotating = false;
+                corsair.drawingLine = false;
+                corsair.annotations.pop();
+                console.log(this.myChartRef.current.config.options.plugins.corsair);
+                this.myChartRef.current.draw();
+              }
             }}>☓</button>
           </div>
           <div className='tools-box-name'>Point</div>

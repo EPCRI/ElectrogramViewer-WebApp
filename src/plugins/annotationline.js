@@ -1,10 +1,8 @@
 class AnnotationLine {
-  constructor(chart, x) {
+  constructor(chart, idx1) {
     this.completed = false;
-    this.x1 = x;
-    this.x2 = x;
-    this.time1 = AnnotationLine.pixelToTime(chart, x);
-    this.time2 = this.time1;
+    this.idx1 = idx1;
+    this.idx2 = idx1;
     this.comment = '';
   }
 
@@ -12,35 +10,51 @@ class AnnotationLine {
     const { ctx, chartArea: {top, bottom} } = chart;
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = 'red'
-    
-    if (this.x1) {
+    const x1 = AnnotationLine.idxToPixel(chart, this.idx1);
+    console.log(this.idx1 + ' ' + x1);
+    const x2 = AnnotationLine.idxToPixel(chart, this.idx2);
+
+    if (this.idx1) {
       ctx.beginPath();
-      ctx.moveTo(this.x1, bottom);
-      ctx.lineTo(this.x1, top);
+      ctx.moveTo(x1, bottom);
+      ctx.lineTo(x1, top);
       ctx.stroke();
       ctx.closePath();
     }
-    if (this.x2) {
+    if (this.idx2) {
       ctx.beginPath();
-      ctx.moveTo(this.x2, bottom);
-      ctx.lineTo(this.x2, top);
+      ctx.moveTo(x2, bottom);
+      ctx.lineTo(x2, top);
       ctx.stroke();
       ctx.closePath();
 
       ctx.beginPath();
-      ctx.moveTo(this.x1, top - 50);
-      ctx.lineTo(this.x2, top - 50);
+      ctx.moveTo(x1, top - 50);
+      ctx.lineTo(x2, top - 50);
       ctx.stroke();
       ctx.closePath();
     }
   }
 
-  static pixelToTime(chart, x) {
+  static pixelToIdx(chart, x) {
     const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
-    const electrogramParams = chart.config.options.electrogramParams;
-    const time = ((x - 7.5) / width) * electrogramParams.numPointsOnChart + electrogramParams.dataIdxLeft;
-    console.log(`pixel: ${x}, timeIdx: ${Math.round(time)}, time: ${chart.config.options.completeDataset.labels[Math.round(time)]}`);
-    return time;
+    const ecgParams = chart.config.options.electrogramParams;
+    // pixel (with offset correction) to total dataset index
+    console.log(x);
+    console.log(ecgParams);
+    const dataIdx = Math.round(((x - left) / width) * ecgParams.numPointsOnChart + ecgParams.dataIdxLeft);
+    console.log(`pixel: ${x}, timeIdx: ${dataIdx}, time: ${chart.config.options.completeDataset.labels[dataIdx]}`);
+    return dataIdx;
+  }
+
+  static idxToPixel(chart, dataIdx) {
+    const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+    const ecgParams = chart.config.options.electrogramParams;
+    //todo offset ref
+    console.log("LEFT " + left);
+    const x = (dataIdx - ecgParams.dataIdxLeft) * width / ecgParams.numPointsOnChart + left;
+    console.log(`dataIdx: ${dataIdx}, time: ${chart.config.options.completeDataset.labels[dataIdx]}, pixel: ${x}`);
+    return x;
   }
 }
 
@@ -59,17 +73,15 @@ const annotationLinePlugin = {
         console.log(chart.config.options.plugins);
         console.log(chart.config.options.plugins.corsair.annotations);
         if (corsair.drawingLine === false) {
-          console.log("first");
-          const annotation = new AnnotationLine(chart, x);
+          console.log("T1 Line");
+          const annotation = new AnnotationLine(chart, AnnotationLine.pixelToIdx(chart, x));
           corsair.annotations.push(annotation);
           corsair.drawingLine = true;
         } else {
-          console.log("second");
+          console.log("T2 Line");
           console.log(corsair.annotations[corsair.annotations.length - 1]);
           corsair.annotations[corsair.annotations.length - 1].completed = true;
-          corsair.annotations[corsair.annotations.length - 1].x2 = x;
-          corsair.annotations[corsair.annotations.length - 1].time2 = AnnotationLine.pixelToTime(chart, x);
-          corsair.drawingLine = false;
+          corsair.annotations[corsair.annotations.length - 1].idx2 = AnnotationLine.pixelToIdx(chart, x);
         }
         console.log(corsair.annotations);
       }
@@ -97,9 +109,11 @@ const annotationLinePlugin = {
     const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
     const datasets = chart.config.options.completeDataset.datasets;
     const annotations = chart.config.options.plugins.corsair.annotations;
-    // console.log(annotations);
+    const ecgParams = chart.config.options.electrogramParams;
     annotations.forEach(element => {
-      element.draw(chart);
+      if (element.idx1 > ecgParams.dataIdxLeft && element.idx2 < ecgParams.dataIdxRight) {
+        element.draw(chart);
+      }
     });
   },
 
@@ -116,7 +130,6 @@ const annotationLinePlugin = {
     ctx.setLineDash(opts.dash || []);
     ctx.strokeStyle = opts.color || 'black'
 
-    console.log("draw");
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x, bottom);
