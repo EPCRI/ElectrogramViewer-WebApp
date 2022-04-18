@@ -181,8 +181,7 @@ export const options = {
     corsair: {
       annotations: [],
       drawingLine: false,
-      horizontal: false,
-      vertical: true,
+      annotating: false,
       draw: true,
       color: 'red',
       dash: [],
@@ -312,16 +311,19 @@ class ApexChart extends React.Component {
           </select>
           <div className='tools-box-name'>Window</div>
           <button className='select-buttons' onClick={() => {
-            this.myChartRef.current.config.options.plugins.corsair.draw = true;
+            this.myChartRef.current.config.options.plugins.corsair.annotating = true;
             console.log(this.myChartRef.current.config.options.plugins.corsair);
             }}>T1</button>
-          <button className='select-buttons' onClick={() => {
-            this.myChartRef.current.config.options.plugins.corsair.draw = false;
-            console.log(this.myChartRef.current.config.options.plugins.corsair);
-            }}>T2</button>
+          <button className='select-buttons'>T2</button>
           <div>
-            <button className='confirm-buttons'>✓</button>
-            <button className='confirm-buttons'>☓</button>
+            <button className='confirm-buttons' onClick={() => {
+            this.myChartRef.current.config.options.plugins.corsair.annotating = false;
+            console.log(this.myChartRef.current.config.options.plugins.corsair);
+            }}>✓</button>
+            <button className='confirm-buttons'onClick={() => {
+            this.myChartRef.current.config.options.plugins.corsair.annotating = false;
+            console.log(this.myChartRef.current.config.options.plugins.corsair);
+            }}>☓</button>
           </div>
           <div className='tools-box-name'>Point</div>
           <button className='select-buttons'>✎</button>

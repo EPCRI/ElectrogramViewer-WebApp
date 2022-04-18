@@ -47,12 +47,14 @@ class AnnotationLine {
 const annotationLinePlugin = {
   id: 'corsair',
   afterInit: (chart) => {
+    const corsair = chart.config.options.plugins.corsair;
+    corsair.x = 0;
+    corsair.y = 0;
     chart.canvas.addEventListener('click', (event) => {
       const { chartArea: { top, bottom, left, right } } = chart;
       const x = event.offsetX;
       console.log(event);
-      if (x >= left + 30 && x <= right - 30) {
-        const corsair = chart.config.options.plugins.corsair;
+      if (x >= left + 30 && x <= right - 40 && corsair.annotating) {
         console.log("Adding annotation");
         console.log(chart.config.options.plugins);
         console.log(chart.config.options.plugins.corsair.annotations);
@@ -79,13 +81,16 @@ const annotationLinePlugin = {
     let corsair = chart.config.options.plugins.corsair;
     const { x, y } = evt.event;
     if (x < left || x > right || y < top || y > bottom) {
-      corsair = { x, y, draw: false }
+      corsair.x = x;
+      corsair.draw = false;
       chart.draw();
       return;
     }
-
-    corsair = { x, y, draw: true }
-    chart.draw();
+    if (corsair.annotating) {
+      corsair.x = x;
+      corsair.draw = true;
+      chart.draw();
+    }
   },
 
   afterDraw(chart, args, pluginOptions) {
@@ -101,7 +106,7 @@ const annotationLinePlugin = {
   afterDatasetsDraw: (chart, _, opts) => {
     const { ctx, chartArea: { top, bottom, left, right } } = chart;
     const corsair = chart.config.options.plugins.corsair;
-    const { x, y, draw } = corsair;
+    const { x, draw } = corsair;
 
     if (!draw) {
       return;
@@ -111,18 +116,11 @@ const annotationLinePlugin = {
     ctx.setLineDash(opts.dash || []);
     ctx.strokeStyle = opts.color || 'black'
 
+    console.log("draw");
     ctx.save();
     ctx.beginPath();
-    console.log(corsair);
-    if (corsair.vertical) {
-      console.log("draw");
-      ctx.moveTo(x, bottom);
-      ctx.lineTo(x, top);
-    }
-    if (corsair.horizontal) {
-      ctx.moveTo(left, y);
-      ctx.lineTo(right, y);
-    }
+    ctx.moveTo(x, bottom);
+    ctx.lineTo(x, top);
     ctx.stroke();
     ctx.restore();
   }
