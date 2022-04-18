@@ -1,65 +1,107 @@
-// annotationline.js
-// custom line marker plugin
-const annotations = [];
-
-const annotation2 = {
-  type: 'line',
-  borderColor: 'green',
-  borderDash: [6, 6],
-  borderWidth: 1,
-  xMax: 100,
-  xMin: 100,
-  xScaleID: 'x',
-  yMax: 0,
-  yMin: 300,
-  yScaleID: 'y'
-};
-
 class AnnotationLine {
-  constructor(x) {
-    this.state = {x: x};
+  constructor(chart, x) {
+    this.completed = false;
+    this.x1 = x;
+    this.x2 = x;
+    this.time1 = AnnotationLine.pixelToTime(chart, x);
+    this.time2 = this.time1;
+    this.comment = '';
   }
 
   draw(chart) {
-    console.log("AnnotationLine draw()");
     const { ctx, chartArea: {top, bottom} } = chart;
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = 'red'
     
-    ctx.beginPath();
-    ctx.moveTo(this.state.x, bottom);
-    ctx.lineTo(this.state.x, top);
-    ctx.stroke();
+    if (this.x1) {
+      ctx.beginPath();
+      ctx.moveTo(this.x1, bottom);
+      ctx.lineTo(this.x1, top);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    if (this.x2) {
+      ctx.beginPath();
+      ctx.moveTo(this.x2, bottom);
+      ctx.lineTo(this.x2, top);
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.moveTo(this.x1, top - 50);
+      ctx.lineTo(this.x2, top - 50);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  static pixelToTime(chart, x) {
+    const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+    const electrogramParams = chart.config.options.electrogramParams;
+    const time = ((x - 7.5) / width) * electrogramParams.numPointsOnChart + electrogramParams.dataIdxLeft;
+    console.log(`pixel: ${x}, timeIdx: ${Math.round(time)}, time: ${chart.config.options.completeDataset.labels[Math.round(time)]}`);
+    return time;
   }
 }
 
 const annotationLinePlugin = {
   id: 'corsair',
   afterInit: (chart) => {
-
-    chart.corsair = { x: 0, y: 0 }
-    // chart.canvas.addEventListener('click', (event) => {
-    //   const x = event.offsetX;
-    //   chart.config.options.plugins.annotation.annotations['annotation2'] = annotation2;
-    // });
+    chart.canvas.addEventListener('click', (event) => {
+      const { chartArea: { top, bottom, left, right } } = chart;
+      const x = event.offsetX;
+      console.log(event);
+      if (x >= left + 30 && x <= right - 30) {
+        const corsair = chart.config.options.plugins.corsair;
+        console.log("Adding annotation");
+        console.log(chart.config.options.plugins);
+        console.log(chart.config.options.plugins.corsair.annotations);
+        if (corsair.drawingLine === false) {
+          console.log("first");
+          const annotation = new AnnotationLine(chart, x);
+          corsair.annotations.push(annotation);
+          corsair.drawingLine = true;
+        } else {
+          console.log("second");
+          console.log(corsair.annotations[corsair.annotations.length - 1]);
+          corsair.annotations[corsair.annotations.length - 1].completed = true;
+          corsair.annotations[corsair.annotations.length - 1].x2 = x;
+          corsair.annotations[corsair.annotations.length - 1].time2 = AnnotationLine.pixelToTime(chart, x);
+          corsair.drawingLine = false;
+        }
+        console.log(corsair.annotations);
+      }
+    });
   },
+
   afterEvent: (chart, evt) => {
     const { chartArea: { top, bottom, left, right } } = chart;
+    let corsair = chart.config.options.plugins.corsair;
     const { x, y } = evt.event;
     if (x < left || x > right || y < top || y > bottom) {
-      chart.corsair = { x, y, draw: false }
+      corsair = { x, y, draw: false }
       chart.draw();
       return;
     }
 
-    chart.corsair = { x, y, draw: true }
-    console.log("chart.draw()");
+    corsair = { x, y, draw: true }
     chart.draw();
+  },
+
+  afterDraw(chart, args, pluginOptions) {
+    const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+    const datasets = chart.config.options.completeDataset.datasets;
+    const annotations = chart.config.options.plugins.corsair.annotations;
+    // console.log(annotations);
+    annotations.forEach(element => {
+      element.draw(chart);
+    });
   },
 
   afterDatasetsDraw: (chart, _, opts) => {
     const { ctx, chartArea: { top, bottom, left, right } } = chart;
-    const { x, y, draw } = chart.corsair;
+    const corsair = chart.config.options.plugins.corsair;
+    const { x, y, draw } = corsair;
 
     if (!draw) {
       return;
@@ -71,11 +113,13 @@ const annotationLinePlugin = {
 
     ctx.save();
     ctx.beginPath();
-    if (opts.vertical) {
+    console.log(corsair);
+    if (corsair.vertical) {
+      console.log("draw");
       ctx.moveTo(x, bottom);
       ctx.lineTo(x, top);
     }
-    if (opts.horizontal) {
+    if (corsair.horizontal) {
       ctx.moveTo(left, y);
       ctx.lineTo(right, y);
     }

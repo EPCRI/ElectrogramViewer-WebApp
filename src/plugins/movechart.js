@@ -75,9 +75,14 @@ const movechart = [
   
         // moveable bar
         const min = ecgParams.dataIdxLeft;
-        let startingPoint = left + 15 + width / datasets[0].data.length * min;
-        const barWidth = (width - 30) / datasets[0].data.length * ecgParams.numPointsOnChart;
+        let startingPoint = min * (width / datasets[0].data.length) + left + 15;
+        // console.log(`${startingPoint} = ${left} + 15 + ${min} * (${width} / ${datasets[0].data.length})`);
+        const barWidth = (ecgParams.numPointsOnChart / datasets[0].data.length) * (width - 30) ;
+        // console.log(`${barWidth} = (${width} - 30) / ${datasets[0].data.length} * ${ecgParams.numPointsOnChart}`);
         const totalWidth = startingPoint + barWidth;
+        if (startingPoint < left + 15) {
+          startingPoint = left + 15;
+        }
         if (totalWidth > width) {
           startingPoint = right - 30 - barWidth;
         }

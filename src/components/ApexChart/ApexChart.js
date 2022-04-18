@@ -12,7 +12,6 @@ import {
 import { Chart, Line } from 'react-chartjs-2';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationLinePlugin from '../../plugins/annotationline';
-import annotationPlugin from 'chartjs-plugin-annotation';
 import movechart from '../../plugins/movechart';
 import './ApexChart.css';
 
@@ -26,7 +25,7 @@ ChartJS.register(
   Legend,
   zoomPlugin,
   annotationLinePlugin,
-  // annotationPlugin,
+  movechart,
 );
 
 export const data = {
@@ -51,19 +50,6 @@ const annotation = {
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
   scrollButtonCheck(event);
-  annotationCheck(event);
-}
-
-function annotationCheck(event) {
-  const x = event.x;
-  const y = event.y;
-  const myChart = event.chart;
-  const { ctx, canvas, chartArea: {left, right, top, bottom, width, height} } = myChart;
-
-  if (x >= left + 30 && x <= right - 30) {
-    // let annotation = new AnnotationLine();
-    // annotation.draw(event);
-  }
 }
 
 function scrollButtonCheck(event) {
@@ -134,7 +120,7 @@ function scrollButtonCheck(event) {
     myChart.update('none');
   }
 
-  console.log(`Left Index: ${myChart.config.options.electrogramParams.dataIdxLeft}, Right Index: ${myChart.config.options.electrogramParams.dataIdxRight}`);
+  // console.log(`Left Index: ${myChart.config.options.electrogramParams.dataIdxLeft}, Right Index: ${myChart.config.options.electrogramParams.dataIdxRight}`);
 }
 
 export const options = {
@@ -194,15 +180,14 @@ export const options = {
     },
     corsair: {
       annotations: [],
+      drawingLine: false,
       horizontal: false,
       vertical: true,
+      draw: true,
       color: 'red',
       dash: [],
       width: 1,
     },
-    annotation: {
-      annotations: [],
-    }
   },
   onClick: function (evt, element) {
     mouseClickFunction(evt);
@@ -248,7 +233,10 @@ class ApexChart extends React.Component {
     super(props);
     extractDataToDatasets();
     this.myChartRef = React.createRef();
-    this.state = { zoom_value: 1 };
+    this.state = { 
+      zoom_value: 1,
+
+    };
     this.handleZoomChange = this.handleZoomChange.bind(this);
   }
 
@@ -312,16 +300,35 @@ class ApexChart extends React.Component {
             height={"100%"} 
             width={"100%"} 
             options={options}
-            plugins={[movechart,annotationLinePlugin]}
+            plugins={annotationLinePlugin}
             data={extractDataToDatasets(options)} />
         </div>
-        <div className='tool-box'>
+        <div className='tools-box'>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
             <option value={8}>400</option>
             <option value={3.8}>200</option>
             <option value={2}>100</option>
             <option value={1}>67</option>
           </select>
+          <div className='tools-box-name'>Window</div>
+          <button className='select-buttons' onClick={() => {
+            this.myChartRef.current.config.options.plugins.corsair.draw = true;
+            console.log(this.myChartRef.current.config.options.plugins.corsair);
+            }}>T1</button>
+          <button className='select-buttons' onClick={() => {
+            this.myChartRef.current.config.options.plugins.corsair.draw = false;
+            console.log(this.myChartRef.current.config.options.plugins.corsair);
+            }}>T2</button>
+          <div>
+            <button className='confirm-buttons'>✓</button>
+            <button className='confirm-buttons'>☓</button>
+          </div>
+          <div className='tools-box-name'>Point</div>
+          <button className='select-buttons'>✎</button>
+          <div>
+            <button className='confirm-buttons'>✓</button>
+            <button className='confirm-buttons'>☓</button>
+          </div>
         </div>
       </div>
     );

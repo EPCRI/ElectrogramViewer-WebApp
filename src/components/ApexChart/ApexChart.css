@@ -1,11 +1,31 @@
 .chart-container {
   min-width: 100%;
   min-height: 100%;
-  display:flex
+  display: flex;
+  position: relative;
 }
 
 .tools-box {
   position: absolute;
   top: 0;
   right: 0;
+  background-color: white;
+  width: 60px;
+  outline: black solid 1px;
+  padding: 5px;
+}
+
+.tools-box-name {
+  text-decoration: underline;
+  font-size: small;
+  text-align: center;
+}
+
+.select-buttons {
+  width: 50px;
+}
+
+.confirm-buttons {
+  width: 25px;
+  text-align: center;
 }
