@@ -67,7 +67,7 @@ const movechart = [
         ctx.closePath();
   
         ctx.beginPath();
-        ctx.fillStyle = 'rgba(255, 26, 104, 0.5)';
+        ctx.fillStyle = 'lightgrey';
         ctx.rect(left, bottom + 60, 15, 15);
         ctx.rect(right - 30, bottom + 60, 15, 15);
         ctx.fill();
@@ -88,7 +88,7 @@ const movechart = [
         }
   
         ctx.beginPath();
-        ctx.fillStyle = 'black'; 
+        ctx.fillStyle = 'grey'; 
         ctx.rect(startingPoint, bottom + 60, barWidth, 15);
         ctx.fill();
         ctx.closePath();

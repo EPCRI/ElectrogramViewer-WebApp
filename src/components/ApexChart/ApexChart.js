@@ -142,8 +142,8 @@ export const options = {
     separation: 16000,
     maxPointsOnChart: 20000,
     dataIdxLeft: 0,
-    dataIdxRight: 20000,
-    numPointsOnChart: 20000,
+    dataIdxRight: 10000,
+    numPointsOnChart: 10000,
   },
   layout: {
     padding: {
@@ -158,10 +158,13 @@ export const options = {
       ticks: {
         autoSkip: true,
         maxTicksLimit: 40,
+        maxRotation: 90,
+        minRotation: 90,
+        precision: 2,
       },
     },
     y: {
-      min: -5000,
+      min: -10000,
       max: 205000,
       display: false,
       beginAtZero: true,
@@ -209,12 +212,12 @@ function extractAllDataToDatasets() {
     options.completeDataset.datasets.push({
       label: channel,
       data: data_points,
-      borderColor: options.ecgColors[i],
+      borderColor: options.ecgColors[1],
     });
     sets.push({
       label: channel,
       data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
-      borderColor: options.ecgColors[i],
+      borderColor: options.ecgColors[1],
     });
   }
   options.completeDataset.labels = json['Time'];
@@ -253,7 +256,7 @@ class ApexChart extends React.Component {
     extractAllDataToDatasets();
     this.myChartRef = React.createRef();
     this.state = { 
-      zoom_value: 1,
+      zoom_value: 2,
 
     };
     this.handleZoomChange = this.handleZoomChange.bind(this);
@@ -353,12 +356,12 @@ class ApexChart extends React.Component {
               }
             }}>☓</button>
           </div>
-          <div className='tools-box-name'>Point</div>
+          {/* <div className='tools-box-name'>Point</div>
           <button className='select-buttons'>✎</button>
           <div>
             <button className='confirm-buttons'>✓</button>
             <button className='confirm-buttons'>☓</button>
-          </div>
+          </div> */}
         </div>
       </div>
     );

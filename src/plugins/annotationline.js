@@ -14,25 +14,37 @@ class AnnotationLine {
     console.log(this.idx1 + ' ' + x1);
     const x2 = AnnotationLine.idxToPixel(chart, this.idx2);
 
-    if (this.idx1) {
-      ctx.beginPath();
-      ctx.moveTo(x1, bottom);
-      ctx.lineTo(x1, top);
-      ctx.stroke();
-      ctx.closePath();
-    }
-    if (this.idx2) {
-      ctx.beginPath();
-      ctx.moveTo(x2, bottom);
-      ctx.lineTo(x2, top);
-      ctx.stroke();
-      ctx.closePath();
+    // First line
+    ctx.beginPath();
+    ctx.moveTo(x1, bottom);
+    ctx.lineTo(x1, top);
+    ctx.stroke();
+    ctx.closePath();
 
-      ctx.beginPath();
-      ctx.moveTo(x1, top - 50);
-      ctx.lineTo(x2, top - 50);
-      ctx.stroke();
-      ctx.closePath();
+    // second line
+    ctx.beginPath();
+    ctx.moveTo(x2, bottom);
+    ctx.lineTo(x2, top);
+    ctx.stroke();
+    ctx.closePath();
+
+    // draw connecting line
+    ctx.beginPath();
+    console.log(`x1: ${x1}, x2: ${x2}, top: ${top}, bottom: ${bottom}`);
+    ctx.moveTo(x1, top + 15);
+    ctx.lineTo(x2, top + 15);
+    ctx.stroke();
+    ctx.closePath();
+
+    // draw time diff
+    ctx.beginPath();
+    ctx.font('normal medium system-ui');
+    if (Math.abs(Math.round(x2 - x1)) < 50) {
+      ctx.textAlign = "end";
+      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))], x1 < x2 ? x1 - 10 : x2 - 10, top + 10);
+    } else {
+      ctx.textAlign = "center";
+      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))], (x1 + x2)/2, top + 10);
     }
   }
 
@@ -40,20 +52,14 @@ class AnnotationLine {
     const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
     const ecgParams = chart.config.options.electrogramParams;
     // pixel (with offset correction) to total dataset index
-    console.log(x);
-    console.log(ecgParams);
     const dataIdx = Math.round(((x - left) / width) * ecgParams.numPointsOnChart + ecgParams.dataIdxLeft);
-    console.log(`pixel: ${x}, timeIdx: ${dataIdx}, time: ${chart.config.options.completeDataset.labels[dataIdx]}`);
     return dataIdx;
   }
 
   static idxToPixel(chart, dataIdx) {
     const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
     const ecgParams = chart.config.options.electrogramParams;
-    //todo offset ref
-    console.log("LEFT " + left);
     const x = (dataIdx - ecgParams.dataIdxLeft) * width / ecgParams.numPointsOnChart + left;
-    console.log(`dataIdx: ${dataIdx}, time: ${chart.config.options.completeDataset.labels[dataIdx]}, pixel: ${x}`);
     return x;
   }
 }
