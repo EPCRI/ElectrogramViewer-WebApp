@@ -1,4 +1,5 @@
 class AnnotationLine {
+
   constructor(chart, idx1) {
     this.completed = false;
     this.idx1 = idx1;
@@ -31,20 +32,20 @@ class AnnotationLine {
     // draw connecting line
     ctx.beginPath();
     console.log(`x1: ${x1}, x2: ${x2}, top: ${top}, bottom: ${bottom}`);
-    ctx.moveTo(x1, top + 15);
-    ctx.lineTo(x2, top + 15);
+    ctx.moveTo(x1, top + 25);
+    ctx.lineTo(x2, top + 25);
     ctx.stroke();
     ctx.closePath();
 
     // draw time diff
     ctx.beginPath();
-    ctx.font('normal medium system-ui');
-    if (Math.abs(Math.round(x2 - x1)) < 50) {
+    ctx.font = "bold large system-ui";
+    if (Math.abs(Math.round(x2 - x1)) < 80) {
       ctx.textAlign = "end";
-      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))], x1 < x2 ? x1 - 10 : x2 - 10, top + 10);
+      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))] * 1000 + 'ms', x1 < x2 ? x1 - 10 : x2 - 10, top + 20);
     } else {
       ctx.textAlign = "center";
-      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))], (x1 + x2)/2, top + 10);
+      ctx.fillText(chart.config.options.completeDataset.labels[Math.abs(Math.round(this.idx2 - this.idx1))] * 1000 + 'ms', (x1 + x2)/2, top + 20);
     }
   }
 

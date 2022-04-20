@@ -74,6 +74,7 @@ function scrollButtonCheck(event) {
       dataIdxRight = datasets[0].data.length;
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart);
+      lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.datasets.forEach((dataset, index) => {
         dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
         dataset.data.splice(0, numPointsOnChart);
@@ -81,6 +82,7 @@ function scrollButtonCheck(event) {
     } else {
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart);
+      lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
       myChart.config.data.datasets.forEach((dataset, index) => {
@@ -99,6 +101,7 @@ function scrollButtonCheck(event) {
       dataIdxRight = numPointsOnChart;
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart);
+      lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
       myChart.config.data.datasets.forEach((dataset, index) => {
         dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
@@ -107,6 +110,7 @@ function scrollButtonCheck(event) {
     } else {
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart);
+      lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
       myChart.config.data.datasets.forEach((dataset, index) => {
@@ -156,11 +160,10 @@ export const options = {
       min: 0,
       max: 20000,
       ticks: {
-        autoSkip: true,
+        crossAlign: "start",
         maxTicksLimit: 40,
         maxRotation: 90,
         minRotation: 90,
-        precision: 2,
       },
     },
     y: {
@@ -222,7 +225,7 @@ function extractAllDataToDatasets() {
   }
   options.completeDataset.labels = json['Time'];
   data.datasets = sets;
-  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight);
+  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight).map(element => element.toFixed(2));
   return data;
 }
 
@@ -244,7 +247,7 @@ function extractDataToDatasets() {
   }
   options.completeDataset.labels = json['Time'];
   data.datasets = sets;
-  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight);
+  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight).map(element => element.toFixed(2));
   return data;
 }
 
@@ -341,9 +344,12 @@ class ApexChart extends React.Component {
           <div>
             <button className='confirm-buttons' onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
-              corsair.annotating = false;
-              corsair.drawingLine = false;
-              console.log(this.myChartRef.current.config.options.plugins.corsair);
+              if(corsair.drawingLine) {
+                corsair.annotating = false;
+                corsair.drawingLine = false;
+                console.log(this.props);
+                this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
+              }
             }}>✓</button>
             <button className='confirm-buttons'onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
@@ -351,7 +357,6 @@ class ApexChart extends React.Component {
                 corsair.annotating = false;
                 corsair.drawingLine = false;
                 corsair.annotations.pop();
-                console.log(this.myChartRef.current.config.options.plugins.corsair);
                 this.myChartRef.current.draw();
               }
             }}>☓</button>

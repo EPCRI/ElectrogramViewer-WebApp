@@ -7,6 +7,17 @@ import './App.css';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {file: "", annotations: []}
+    this.addAnnotation = this.addAnnotation.bind(this);
+  }
+
+  addAnnotation (annotation) {
+    console.log("addAnnotation()");
+    this.setState({annotations: [...this.state.annotations, annotation]});
+  }
+
+  removeAnnotation (annotationId) {
+    
   }
 
   render(){
@@ -14,7 +25,7 @@ class App extends React.Component {
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI />
-        <ChartWindow />
+        <ChartWindow annotations={this.state.annotations} addAnnotation={this.addAnnotation}/>
       </div>
     );
   }
