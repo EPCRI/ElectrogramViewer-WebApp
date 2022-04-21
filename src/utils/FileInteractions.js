@@ -1,9 +1,9 @@
 // FileInteraction.js
-const path = require('path');
-const fs = require('fs');
+// const path = require('path');
+// const fs = require('fs');
 
 export function getFileNames() {
-    console.log(path);
+    // console.log(path);
 
     // read recording file names
     // const folderPath = './../../../data/recordings/';
