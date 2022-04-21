@@ -21,7 +21,11 @@ class ChartWindow extends React.Component {
             <ApexChart annotations={this.props.annotations} addAnnotation={this.props.addAnnotation}/>
           </div>
           <div className="column right">
-            {this.props.annotations.map(element => <Annotation annotation={element} removeAnnotation={this.props.removeAnnotation}/>)}
+            {this.props.annotations.map(element => (
+              <Annotation 
+                annotation={element} 
+                removeAnnotation={this.props.removeAnnotation}
+                addComment={this.props.addComment}/>))}
           </div>
         </div>
       );

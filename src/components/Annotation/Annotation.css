@@ -16,7 +16,7 @@
 }
 
 .ann-middle {
-    width: 55%;
+    width: 45%;
     padding: 1px;
     display: flex
 }
@@ -27,7 +27,7 @@
 }
 
 .ann-right{
-    width: 10%;
+    width: 20%;
 }
 
 .annotation-row{
@@ -41,9 +41,9 @@
     clear: both;
 }
 
-.delete {
+.comment-button {
     text-align: center;
-    width: 100%;
+    width: 50%;
     height: 100%;
 }
   

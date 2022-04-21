@@ -2,11 +2,12 @@ class AnnotationLine {
 
   constructor(chart, idx1) {
     this.completed = false;
+    this.timeCreated = Date.now();
+    this.comment = '';
     this.idx1 = idx1;
     this.t1 = chart.config.options.completeDataset.labels[this.idx1];
     this.idx2 = idx1;
     this.t2 = chart.config.options.completeDataset.labels[this.idx1];
-    this.timeCreated = Date.now();
   }
 
   draw(chart) {

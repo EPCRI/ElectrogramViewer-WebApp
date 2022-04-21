@@ -13,8 +13,8 @@ class FileUI extends React.Component {
     render() {
         return(
             <div className='file-input-wrapper'>
-                <h3 style={{'textAlign': 'left', marginLeft: 20, marginTop: 10}}>{this.state.files[this.state.selectedFileIdx]}</h3>
-                <div style={{display: 'flex','alignContent': 'left', paddingLeft: 20}}>
+                <h3 style={{'textAlign': 'left', marginLeft: 10, marginTop: 10, marginBottom: 0}}>{this.state.files[this.state.selectedFileIdx]}</h3>
+                <div style={{display: 'flex','alignContent': 'left', marginLeft: 10, marginBottom: 10}}>
                     <select>
                         {this.state.files.map(file => {
                             return <option value={file}>{file}</option>
