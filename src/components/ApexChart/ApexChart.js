@@ -260,9 +260,23 @@ class ApexChart extends React.Component {
     this.myChartRef = React.createRef();
     this.state = { 
       zoom_value: 2,
-
     };
     this.handleZoomChange = this.handleZoomChange.bind(this);
+  }
+
+  updateAnnotations() {
+    window.setTimeout(() => {
+      this.myChartRef.current.config.options.plugins.corsair.annotations = this.props.annotations.slice();
+      this.myChartRef.current.update('none');
+    });
+  }
+
+  componentDidMount() {
+    this.updateAnnotations();
+  }
+
+  componentDidUpdate() {
+    this.updateAnnotations();
   }
 
   handleZoomChange(event) {
@@ -347,11 +361,12 @@ class ApexChart extends React.Component {
               if(corsair.drawingLine) {
                 corsair.annotating = false;
                 corsair.drawingLine = false;
-                console.log(this.props);
+                console.log("Adding");
+                console.log("Length: " + corsair.annotations.length);
                 this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
               }
             }}>✓</button>
-            <button className='confirm-buttons'onClick={() => {
+            <button className='confirm-buttons' onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
               if (corsair.drawingLine) {
                 corsair.annotating = false;

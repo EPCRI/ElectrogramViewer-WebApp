@@ -3,8 +3,10 @@ class AnnotationLine {
   constructor(chart, idx1) {
     this.completed = false;
     this.idx1 = idx1;
+    this.t1 = chart.config.options.completeDataset.labels[this.idx1];
     this.idx2 = idx1;
-    this.comment = '';
+    this.t2 = chart.config.options.completeDataset.labels[this.idx1];
+    this.timeCreated = Date.now();
   }
 
   draw(chart) {
@@ -12,7 +14,6 @@ class AnnotationLine {
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = 'red'
     const x1 = AnnotationLine.idxToPixel(chart, this.idx1);
-    console.log(this.idx1 + ' ' + x1);
     const x2 = AnnotationLine.idxToPixel(chart, this.idx2);
 
     // First line
@@ -31,7 +32,6 @@ class AnnotationLine {
 
     // draw connecting line
     ctx.beginPath();
-    console.log(`x1: ${x1}, x2: ${x2}, top: ${top}, bottom: ${bottom}`);
     ctx.moveTo(x1, top + 25);
     ctx.lineTo(x2, top + 25);
     ctx.stroke();
@@ -74,23 +74,19 @@ const annotationLinePlugin = {
     chart.canvas.addEventListener('click', (event) => {
       const { chartArea: { top, bottom, left, right } } = chart;
       const x = event.offsetX;
-      console.log(event);
       if (x >= left + 30 && x <= right - 40 && corsair.annotating) {
-        console.log("Adding annotation");
-        console.log(chart.config.options.plugins);
-        console.log(chart.config.options.plugins.corsair.annotations);
+       
         if (corsair.drawingLine === false) {
           console.log("T1 Line");
           const annotation = new AnnotationLine(chart, AnnotationLine.pixelToIdx(chart, x));
           corsair.annotations.push(annotation);
           corsair.drawingLine = true;
         } else {
-          console.log("T2 Line");
-          console.log(corsair.annotations[corsair.annotations.length - 1]);
+          const idx2 = AnnotationLine.pixelToIdx(chart, x);
           corsair.annotations[corsair.annotations.length - 1].completed = true;
-          corsair.annotations[corsair.annotations.length - 1].idx2 = AnnotationLine.pixelToIdx(chart, x);
+          corsair.annotations[corsair.annotations.length - 1].idx2 = idx2;
+          corsair.annotations[corsair.annotations.length - 1].t2 = chart.config.options.completeDataset.labels[idx2];
         }
-        console.log(corsair.annotations);
       }
     });
   },

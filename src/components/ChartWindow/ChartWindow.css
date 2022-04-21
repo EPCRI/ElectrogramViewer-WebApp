@@ -37,6 +37,11 @@
 .right{
     width: 20%;
     background-color: whitesmoke;
+    overflow-y: scroll;
+}
+
+.right > div {
+    margin-top: .5vh;
 }
 
 .row{
