@@ -73,7 +73,7 @@ function scrollButtonCheck(event) {
       dataIdxLeft = datasets[0].data.length - numPointsOnChart;
       dataIdxRight = datasets[0].data.length;
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-      lbls.splice(0, numPointsOnChart);
+      lbls.splice(0, numPointsOnChart + 1);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.datasets.forEach((dataset, index) => {
         dataset.data = dataset.data.concat(datasets[index].data.slice(dataIdxLeft, dataIdxRight));
@@ -81,7 +81,7 @@ function scrollButtonCheck(event) {
       })
     } else {
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-      lbls.splice(0, numPointsOnChart);
+      lbls.splice(0, numPointsOnChart + 1);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
@@ -100,7 +100,7 @@ function scrollButtonCheck(event) {
       dataIdxLeft = 0;
       dataIdxRight = numPointsOnChart;
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-      lbls.splice(0, numPointsOnChart);
+      lbls.splice(0, numPointsOnChart + 1);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
       myChart.config.data.datasets.forEach((dataset, index) => {
@@ -109,7 +109,7 @@ function scrollButtonCheck(event) {
       })
     } else {
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
-      lbls.splice(0, numPointsOnChart);
+      lbls.splice(0, numPointsOnChart + 1);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
