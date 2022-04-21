@@ -1,6 +1,7 @@
 import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
+import { getFileNames } from '../../utils/FileInteractions';
 import './App.css';
 // const fs = require('fs');
 
@@ -8,16 +9,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     
-    // read recording file names
-    // const folderPath = './../../../data/recordings/';
-    // const allFiles = [];
-    // fs.readdir(folderPath, (err, files) => {
-    //   files.forEach(file => {
-    //     allFiles.push(file);
-    //   })
-    // })
-    // console.log(allFiles);
-    
+    getFileNames();
+
     this.state = {
       currentFileIdx: 0,
       allFiles: [],
