@@ -1,15 +1,12 @@
 import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
-import { getFileNames } from '../../utils/FileInteractions';
+import { getFileNames } from '../../utils/fileIO';
 import './Viewer.module.css';
-// const fs = require('fs');
 
 class Viewer extends React.Component {
   constructor(props) {
     super(props);
-    
-    getFileNames();
 
     this.state = {
       currentFileIdx: 0,
@@ -50,6 +47,19 @@ class Viewer extends React.Component {
 
   componentDidUpdate() {
     console.log(this.state.annotations);
+    console.log(this.state.allFiles);
+  }
+
+  async componentDidMount() {  
+    try {
+      console.log("componentDidMount()");
+      let fileNames = [];
+      fileNames = await getFileNames();
+      this.setState({ allFiles: fileNames });
+    } catch(err) {
+      console.log(err);
+    }
+
   }
 
   render(){
@@ -57,7 +67,6 @@ class Viewer extends React.Component {
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI 
-          allFiles={this.state.allFiles}
           currentFileIdx={this.state.currentFileIdx}/>
         <ChartWindow 
           currentFile={this.state.allFiles[this.state.currentFileIdx]}
