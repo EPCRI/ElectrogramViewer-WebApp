@@ -2,10 +2,10 @@ import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
 import { getFileNames } from '../../utils/FileInteractions';
-import './App.css';
+import './Viewer.module.css';
 // const fs = require('fs');
 
-class App extends React.Component {
+class Viewer extends React.Component {
   constructor(props) {
     super(props);
     
@@ -70,4 +70,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default Viewer;

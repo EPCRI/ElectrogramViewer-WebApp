@@ -1,5 +1,5 @@
 import React from 'react';
-import './FileUI.css';
+import styles from './FileUI.module.css';
 
 class FileUI extends React.Component {
     constructor(props) {
@@ -12,7 +12,7 @@ class FileUI extends React.Component {
 
     render() {
         return(
-            <div className='file-input-wrapper'>
+            <div className={styles['file-input-wrapper']}>
                 <h3 style={{'textAlign': 'left', marginLeft: 10, marginTop: 10, marginBottom: 0}}>{this.state.files[this.state.selectedFileIdx]}</h3>
                 <div style={{display: 'flex','alignContent': 'left', marginLeft: 10, marginBottom: 10}}>
                     <select>

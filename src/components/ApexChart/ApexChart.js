@@ -10,10 +10,9 @@ import {
   Legend,
 } from 'chart.js';
 import { Chart, Line } from 'react-chartjs-2';
-import zoomPlugin from 'chartjs-plugin-zoom';
 import annotationLinePlugin from '../../plugins/annotationline';
 import movechart from '../../plugins/movechart';
-import './ApexChart.css';
+import styles from './ApexChart.module.css';
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +22,6 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  zoomPlugin,
   annotationLinePlugin,
   movechart,
 );
@@ -332,7 +330,7 @@ class ApexChart extends React.Component {
   render() {
 
     return (
-      <div className='chart-container'>
+      <div className={styles.chartcontainer}>
         <div style={{height: '100%', width: '100%'}}>
           <Line 
             ref={this.myChartRef}
@@ -342,21 +340,21 @@ class ApexChart extends React.Component {
             plugins={annotationLinePlugin}
             data={extractAllDataToDatasets(options)} />
         </div>
-        <div className='tools-box'>
+        <div className={styles['tools-box']}>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>
             <option value={8}>400</option>
             <option value={3.8}>200</option>
             <option value={2}>100</option>
             <option value={1}>67</option>
           </select>
-          <div className='tools-box-name'>Window</div>
-          <button className='select-buttons' onClick={() => {
+          <div className={styles['tools-box-name']}>Window</div>
+          <button className={styles['select-buttons']} onClick={() => {
             this.myChartRef.current.config.options.plugins.corsair.annotating = true;
             console.log(this.myChartRef.current.config.options.plugins.corsair);
             }}>T1</button>
-          <button className='select-buttons'>T2</button>
+          <button className={styles['select-buttons']}>T2</button>
           <div>
-            <button className='confirm-buttons' onClick={() => {
+            <button className={styles['confirm-buttons']} onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
               if(corsair.drawingLine) {
                 corsair.annotating = false;
@@ -366,7 +364,7 @@ class ApexChart extends React.Component {
                 this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
               }
             }}>✓</button>
-            <button className='confirm-buttons' onClick={() => {
+            <button className={styles['confirm-buttons']} onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
               if (corsair.drawingLine) {
                 corsair.annotating = false;

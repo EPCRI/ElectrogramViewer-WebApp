@@ -1,6 +1,6 @@
 // Annotation.js
 import React from 'react';
-import './Annotation.css';
+import styles from './Annotation.module.css';
 
 export class Annotation extends React.Component {
     constructor(props) {
@@ -31,16 +31,16 @@ export class Annotation extends React.Component {
 
     render() {
         return (
-            <div className="annotation-row">
-                <div className="annotation-column ann-left">
+            <div className={styles["annotation-row"]}>
+                <div className={`${styles["annotation-column"]} ${styles["ann-left"]}`}>
                     {this.props.annotation.t1.toFixed(3)} - {this.props.annotation.t2.toFixed(3)} s
                 </div>
-                <div className="annotation-column ann-middle">
-                    <input className='input-box' type="text" value={this.state.currentComment} onChange={this.handleChange}></input>
+                <div className={`${styles["annotation-column"]} ${styles["ann-middle"]}`}>
+                    <input className={styles['input-box']} type="text" value={this.state.currentComment} onChange={this.handleChange}></input>
                 </div>
-                <div className="annotation-column ann-right">
-                    <button className="comment-button" onClick={this.handleCommentClick}>✓</button>
-                    <button className="comment-button" onClick={this.handleDeleteClick}>☓</button>
+                <div className={`${styles["annotation-column"]} ${styles["ann-right"]}`}>
+                    <button className={styles["comment-button"]} onClick={this.handleCommentClick}>✓</button>
+                    <button className={styles["comment-button"]} onClick={this.handleDeleteClick}>☓</button>
                 </div>
             </div>
         )

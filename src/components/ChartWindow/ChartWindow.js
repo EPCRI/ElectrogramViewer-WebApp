@@ -1,5 +1,5 @@
 import React from "react";
-import './ChartWindow.css';
+import styles from './ChartWindow.module.css';
 import ApexChart from '../ApexChart/ApexChart';
 import { Annotation } from '../Annotation/Annotation';
 
@@ -12,15 +12,15 @@ class ChartWindow extends React.Component {
 
   render() {
       return (
-        <div className="row">
-          <div className="column left">
+        <div className={styles.row}>
+          <div className={`${styles.column} ${styles.left}`}>
             Signal
-            {traceLeads.map(item => {return <div className="leadItem">{item}</div>})}
+            {traceLeads.map(item => {return <div className={styles.leadItem}>{item}</div>})}
           </div>
-          <div className="column middle">
+          <div className={`${styles.column} ${styles.middle}`}>
             <ApexChart annotations={this.props.annotations} addAnnotation={this.props.addAnnotation}/>
           </div>
-          <div className="column right">
+          <div className={`${styles.column} ${styles.right}`}>
             {this.props.annotations.map(element => (
               <Annotation 
                 annotation={element} 
