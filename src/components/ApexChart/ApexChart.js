@@ -59,7 +59,7 @@ function scrollButtonCheck(event) {
   const numPointsOnChart = myChart.config.options.electrogramParams.numPointsOnChart;
   let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
   let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
-
+  console.log(`INITIAL - left: ${dataIdxLeft}, right: ${dataIdxRight}, numPoints: ${numPointsOnChart}`);
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
@@ -78,8 +78,10 @@ function scrollButtonCheck(event) {
         dataset.data.splice(0, numPointsOnChart);
       })
     } else {
+      console.log(`1 - left: ${dataIdxLeft}, right: ${dataIdxRight}, numPoints: ${numPointsOnChart}`);
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart + 1);
+      console.log(lbls);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
@@ -283,6 +285,7 @@ class ApexChart extends React.Component {
         this.updateChartFile(); 
         this.props.setFileWasUpdated(false);
       }
+      console.log(this.myChartRef.current.config.options.electrogramParams.numPointsOnChart);
       this.myChartRef.current.update('none');
     })
   }
@@ -291,12 +294,14 @@ class ApexChart extends React.Component {
     console.log('updateChartFile()');
     options.electrogramParams.dataIdxLeft = 0;
     options.electrogramParams.dataIdxRight = 10000;
+    options.electrogramParams.numPointsOnChart = 10000;
     try {
       console.log("After render");
       await extractAllDataToDatasets(this.props.currentFileIdx);
       const currentSliceData = extractDataToDatasets();
-      console.log(currentSliceData);
       this.myChartRef.current.config.data = currentSliceData;
+      this.myChartRef.current.config.options = options;
+      this.setState({zoom_value: 2});
       this.myChartRef.current.update('none');
     } catch (err) {
       console.log(err);
