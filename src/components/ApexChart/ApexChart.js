@@ -67,6 +67,7 @@ function scrollButtonCheck(event) {
     dataIdxRight += numPointsOnChart;
 
     if (dataIdxRight >= datasets[0].data.length) {
+      console.log(1);
       dataIdxLeft = datasets[0].data.length - numPointsOnChart;
       dataIdxRight = datasets[0].data.length;
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
@@ -201,7 +202,6 @@ export const options = {
 async function extractAllDataToDatasets(fileIdx) {
   const response = await getFileData(fileIdx);
   let json = response.file;
-  console.log(json);
   const ecgParams = options.electrogramParams;
   options.completeDataset.datasets = [];
   options.completeDataset.labels = [];
@@ -236,14 +236,12 @@ function extractDataToDatasets() {
   for (let i = 0; i < completeDataset.datasets.length; i++) {
     const channel = completeDataset.datasets[i].label;
     let data_points = completeDataset.datasets[i].data
-    console.log(completeDataset.datasets.length);
     sets.push({
       label: channel,
       data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
       borderColor: "black",
     });
   }
-  console.log(sets);
   data.datasets = sets;
   data.labels = completeDataset.labels.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight).map(element => element.toFixed(2));
   return data;
@@ -262,34 +260,44 @@ class ApexChart extends React.Component {
   }
 
   updateAnnotations() {
-    window.setTimeout(() => {
-      this.myChartRef.current.config.options.plugins.corsair.annotations = this.props.annotations.slice();
-      this.myChartRef.current.update('none');
-    });
+    this.myChartRef.current.config.options.plugins.corsair.annotations = this.props.annotations.slice();
   }
 
   async componentDidMount() {
-    this.updateChart();
+    console.log('componentDidMount()');
+    console.log(this.props.fileWasUpdated);
+    window.setTimeout(() => {
+      this.updateAnnotations();
+      this.updateChartFile();
+      this.props.setFileWasUpdated(false);
+      this.myChartRef.current.update('none');
+    })
   }
 
   async componentDidUpdate() {
     console.log('componentDidUpdate()');
-    this.updateAnnotations();
-    this.updateChart();
+    console.log(this.props.fileWasUpdated);
+    window.setTimeout(() => {
+      this.updateAnnotations();
+      if (this.props.fileWasUpdated) { 
+        this.updateChartFile(); 
+        this.props.setFileWasUpdated(false);
+      }
+      this.myChartRef.current.update('none');
+    })
   }
 
-  async updateChart () {
+  async updateChartFile () {
+    console.log('updateChartFile()');
     options.electrogramParams.dataIdxLeft = 0;
     options.electrogramParams.dataIdxRight = 10000;
     try {
-      window.setTimeout(async () => {
-        await extractAllDataToDatasets(this.props.currentFileIdx);
-        const currentSliceData = extractDataToDatasets();
-        console.log(currentSliceData);
-        this.myChartRef.current.config.data = currentSliceData;
-        this.myChartRef.current.update('none');
-      });
-      this.updateAnnotations();
+      console.log("After render");
+      await extractAllDataToDatasets(this.props.currentFileIdx);
+      const currentSliceData = extractDataToDatasets();
+      console.log(currentSliceData);
+      this.myChartRef.current.config.data = currentSliceData;
+      this.myChartRef.current.update('none');
     } catch (err) {
       console.log(err);
     }

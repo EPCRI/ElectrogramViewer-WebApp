@@ -10,13 +10,19 @@ class Viewer extends React.Component {
 
     this.state = {
       currentFileIdx: 0,
+      fileWasUpdated:true,
       allFiles: [],
-      annotations: []
+      annotations: [],
     }
     this.addComment = this.addComment.bind(this);
     this.addAnnotation = this.addAnnotation.bind(this);
     this.removeAnnotation = this.removeAnnotation.bind(this);
     this.changeFile = this.changeFile.bind(this);
+    this.setFileWasUpdated = this.setFileWasUpdated.bind(this);
+  }
+
+  setFileWasUpdated(updatedBool) {
+    this.setState({fileWasUpdated: updatedBool});
   }
 
   addAnnotation (annotation) {
@@ -67,13 +73,16 @@ class Viewer extends React.Component {
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI 
-          changeFile={this.changeFile}/>
+          changeFile={this.changeFile}
+          setFileWasUpdated={this.setFileWasUpdated}/>
         <ChartWindow 
           currentFileIdx={this.state.currentFileIdx}
           annotations={this.state.annotations} 
+          fileWasUpdated={this.state.fileWasUpdated}
           addAnnotation={this.addAnnotation} 
           addComment={this.addComment}
-          removeAnnotation={this.removeAnnotation}/>
+          removeAnnotation={this.removeAnnotation}
+          setFileWasUpdated={this.setFileWasUpdated}/>
       </div>
     );
   }

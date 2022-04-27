@@ -21,7 +21,9 @@ class ChartWindow extends React.Component {
             <ApexChart 
               annotations={this.props.annotations} 
               addAnnotation={this.props.addAnnotation}
-              currentFileIdx={this.props.currentFileIdx}/>
+              currentFileIdx={this.props.currentFileIdx}
+              fileWasUpdated={this.props.fileWasUpdated}
+              setFileWasUpdated={this.props.setFileWasUpdated}/>
           </div>
           <div className={`${styles.column} ${styles.right}`}>
             {this.props.annotations.map((element, index) => (
