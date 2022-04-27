@@ -278,14 +278,12 @@ class ApexChart extends React.Component {
 
   async componentDidUpdate() {
     console.log('componentDidUpdate()');
-    console.log(this.props.fileWasUpdated);
     window.setTimeout(() => {
       this.updateAnnotations();
       if (this.props.fileWasUpdated) { 
         this.updateChartFile(); 
         this.props.setFileWasUpdated(false);
       }
-      console.log(this.myChartRef.current.config.options.electrogramParams.numPointsOnChart);
       this.myChartRef.current.update('none');
     })
   }
@@ -296,7 +294,6 @@ class ApexChart extends React.Component {
     options.electrogramParams.dataIdxRight = 10000;
     options.electrogramParams.numPointsOnChart = 10000;
     try {
-      console.log("After render");
       await extractAllDataToDatasets(this.props.currentFileIdx);
       const currentSliceData = extractDataToDatasets();
       this.myChartRef.current.config.data = currentSliceData;

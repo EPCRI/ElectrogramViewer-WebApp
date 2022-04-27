@@ -28,6 +28,7 @@ class ChartWindow extends React.Component {
           <div className={`${styles.column} ${styles.right}`}>
             {this.props.annotations.map((element, index) => (
               <Annotation 
+                key={index}
                 annotation={element} 
                 removeAnnotation={this.props.removeAnnotation}
                 addComment={this.props.addComment}/>))}

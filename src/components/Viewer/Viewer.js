@@ -73,8 +73,10 @@ class Viewer extends React.Component {
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI 
+          annotations={this.annotations}
           changeFile={this.changeFile}
-          setFileWasUpdated={this.setFileWasUpdated}/>
+          setFileWasUpdated={this.setFileWasUpdated}
+          currentFileIdx={this.state.currentFileIdx}/>
         <ChartWindow 
           currentFileIdx={this.state.currentFileIdx}
           annotations={this.state.annotations} 

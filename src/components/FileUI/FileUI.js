@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './FileUI.module.css';
-import { getFileNames } from '../../utils/fileIO';
+import { getFileNames, saveAnnotationData } from '../../utils/fileIO';
 
 class FileUI extends React.Component {
     constructor(props) {
@@ -11,6 +11,7 @@ class FileUI extends React.Component {
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleLoad = this.handleLoad.bind(this);
+        this.handleSave = this.handleSave.bind(this);
     }
 
     async componentDidMount() {
@@ -23,16 +24,27 @@ class FileUI extends React.Component {
     }
 
     handleChange(event) {
+        event.preventDefault();
         const fileIdx = event.target.value
         console.log(fileIdx);
         this.setState({formFile: fileIdx});
     }
 
     handleLoad(event) {
+        event.preventDefault();
         const fileName = this.state.formFile;
         this.props.changeFile(fileName);
         this.props.setFileWasUpdated(true);
+    }
+
+    async handleSave(event) {
         event.preventDefault();
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations);
+        if (response.result === "successful") {
+            alert("Successfully saved file");
+        } else {
+            alert("Something went wrong");
+        }
     }
 
     render() {
@@ -46,7 +58,7 @@ class FileUI extends React.Component {
                         })}
                     </select>
                     <button onClick={this.handleLoad}>Load</button>
-                    <button>Save</button>
+                    <button onClick={this.handleSave}>Save</button>
                     <button>Next</button>
                 </div>
             </div>
