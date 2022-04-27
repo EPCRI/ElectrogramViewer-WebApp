@@ -15,13 +15,16 @@ class ChartWindow extends React.Component {
         <div className={styles.row}>
           <div className={`${styles.column} ${styles.left}`}>
             Signal
-            {traceLeads.map(item => {return <div className={styles.leadItem}>{item}</div>})}
+            {traceLeads.map((item, index) => {return <div key={index} className={styles.leadItem}>{item}</div>})}
           </div>
           <div className={`${styles.column} ${styles.middle}`}>
-            <ApexChart annotations={this.props.annotations} addAnnotation={this.props.addAnnotation}/>
+            <ApexChart 
+              annotations={this.props.annotations} 
+              addAnnotation={this.props.addAnnotation}
+              currentFileIdx={this.props.currentFileIdx}/>
           </div>
           <div className={`${styles.column} ${styles.right}`}>
-            {this.props.annotations.map(element => (
+            {this.props.annotations.map((element, index) => (
               <Annotation 
                 annotation={element} 
                 removeAnnotation={this.props.removeAnnotation}

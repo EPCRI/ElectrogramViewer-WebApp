@@ -37,7 +37,7 @@ class Viewer extends React.Component {
   }
 
   changeFile (fileIdx) {
-    console.log(`Changing file to ${this.state.allFiles[fileIdx]}`);
+    console.log(`Changing file to ${fileIdx}`);
     this.setState({currentFileIdx: fileIdx});
   }
 
@@ -46,16 +46,15 @@ class Viewer extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.state.annotations);
-    console.log(this.state.allFiles);
+    // console.log(this.state.annotations);
+    // console.log(this.state.allFiles);
   }
 
   async componentDidMount() {  
     try {
-      console.log("componentDidMount()");
       let fileNames = [];
       fileNames = await getFileNames();
-      this.setState({ allFiles: fileNames });
+      this.setState({ currentFileIdx: 0, allFiles: fileNames });
     } catch(err) {
       console.log(err);
     }
@@ -63,13 +62,14 @@ class Viewer extends React.Component {
   }
 
   render(){
+    console.log("currentFileIdx: " + this.state.currentFileIdx);
     return (
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI 
-          currentFileIdx={this.state.currentFileIdx}/>
+          changeFile={this.changeFile}/>
         <ChartWindow 
-          currentFile={this.state.allFiles[this.state.currentFileIdx]}
+          currentFileIdx={this.state.currentFileIdx}
           annotations={this.state.annotations} 
           addAnnotation={this.addAnnotation} 
           addComment={this.addComment}

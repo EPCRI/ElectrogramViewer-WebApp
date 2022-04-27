@@ -9,7 +9,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Chart, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
+import { getFileData } from '../../utils/fileIO';
 import annotationLinePlugin from '../../plugins/annotationline';
 import movechart from '../../plugins/movechart';
 import styles from './ApexChart.module.css';
@@ -31,18 +32,16 @@ export const data = {
   datasets: [],
 };
 
-const annotation = {
-  type: 'line',
-  borderColor: 'green',
-  borderDash: [6, 6],
-  borderWidth: 1,
-  xMax: 300,
-  xMin: 300,
-  xScaleID: 'x',
-  yMax: 0,
-  yMin: 300,
-  yScaleID: 'y'
-};
+const initialData = {
+  labels: [0],
+  datasets: [
+    {
+      label: "",
+      data: [0],
+      borderColor: 'black'
+    }
+  ],
+}
 
 
 function mouseClickFunction(event) {
@@ -117,7 +116,7 @@ function scrollButtonCheck(event) {
       });
     }
   }
-  console.log(`HERE: dataIdxLeft: ${dataIdxLeft}, dataIdxRight: ${dataIdxRight}`);
+  console.log(`dataIdxLeft: ${dataIdxLeft}, dataIdxRight: ${dataIdxRight}`);
   myChart.config.options.electrogramParams.dataIdxLeft = dataIdxLeft;
   myChart.config.options.electrogramParams.dataIdxRight = dataIdxRight;
   console.log(event.chart);
@@ -199,8 +198,10 @@ export const options = {
 };
 
 // Function to prepare signal channel data arrays with all json extracted data
-function extractAllDataToDatasets() {
-  const json = require('./Animal01_12_AVD_120_VVD_0_IVD_0_x1_90bpm.json');
+async function extractAllDataToDatasets(fileIdx) {
+  const response = await getFileData(fileIdx);
+  let json = response.file;
+  console.log(json);
   const ecgParams = options.electrogramParams;
   options.completeDataset.datasets = [];
   options.completeDataset.labels = [];
@@ -218,7 +219,7 @@ function extractAllDataToDatasets() {
     sets.push({
       label: channel,
       data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
-      borderColor: options.ecgColors[1],
+      borderColor: "black",
     });
   }
   options.completeDataset.labels = json['Time'];
@@ -229,23 +230,22 @@ function extractAllDataToDatasets() {
 
 // Function to prepare 
 function extractDataToDatasets() {
-  const json = require('./Animal01_12_AVD_120_VVD_0_IVD_0_x1_90bpm.json');
   const ecgParams = options.electrogramParams;
+  const completeDataset = options.completeDataset;
   let sets = [];
-  for (let i = 0; i < json['Channels'].length - 1; i++) {
-    const channel = json['Channels'][i+1];
-    let data_points = json[channel]
-    data_points = data_points.filter((_,i) => i % ecgParams.decimation === 0);
-    data_points = data_points.map(element=> (ecgParams.gain)*element + ecgParams.separation*(json['Channels'].length-2) - ecgParams.separation*(i-1));
+  for (let i = 0; i < completeDataset.datasets.length; i++) {
+    const channel = completeDataset.datasets[i].label;
+    let data_points = completeDataset.datasets[i].data
+    console.log(completeDataset.datasets.length);
     sets.push({
       label: channel,
       data: data_points.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight),
-      borderColor: options.ecgColors[i],
+      borderColor: "black",
     });
   }
-  options.completeDataset.labels = json['Time'];
+  console.log(sets);
   data.datasets = sets;
-  data.labels = json['Time'].slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight).map(element => element.toFixed(2));
+  data.labels = completeDataset.labels.slice(ecgParams.dataIdxLeft, ecgParams.dataIdxRight).map(element => element.toFixed(2));
   return data;
 }
 
@@ -254,7 +254,6 @@ class ApexChart extends React.Component {
   
   constructor(props) {
     super(props);
-    extractAllDataToDatasets();
     this.myChartRef = React.createRef();
     this.state = { 
       zoom_value: 2,
@@ -269,12 +268,31 @@ class ApexChart extends React.Component {
     });
   }
 
-  componentDidMount() {
-    this.updateAnnotations();
+  async componentDidMount() {
+    this.updateChart();
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
+    console.log('componentDidUpdate()');
     this.updateAnnotations();
+    this.updateChart();
+  }
+
+  async updateChart () {
+    options.electrogramParams.dataIdxLeft = 0;
+    options.electrogramParams.dataIdxRight = 10000;
+    try {
+      window.setTimeout(async () => {
+        await extractAllDataToDatasets(this.props.currentFileIdx);
+        const currentSliceData = extractDataToDatasets();
+        console.log(currentSliceData);
+        this.myChartRef.current.config.data = currentSliceData;
+        this.myChartRef.current.update('none');
+      });
+      this.updateAnnotations();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   handleZoomChange(event) {
@@ -287,13 +305,12 @@ class ApexChart extends React.Component {
     let dataIdxRight = ecgParams.dataIdxRight;
 
     this.setState({ zoom_value: zoomLevel });
-    const newNumPoints = ecgParams.maxPointsOnChart / zoomLevel;
+    const newNumPoints = Math.round(ecgParams.maxPointsOnChart / zoomLevel);
     ecgParams.numPointsOnChart = newNumPoints;
     
     // get new dataset 0 index array based on center of current window
     // result: zoom in is centered on currently viewed data
     const zoomInTime = config.data.labels[Math.floor(config.data.labels.length / 2)];
-    console.log(`zoomInTime: ${zoomInTime}`);
     for (let i = 0; i < labels.length; i++) {
       if (labels[i] > zoomInTime) {
         if (i >= newNumPoints/2) {
@@ -309,16 +326,15 @@ class ApexChart extends React.Component {
     }
 
     dataIdxRight = dataIdxLeft + newNumPoints;
-    config.data = extractDataToDatasets();
+    ecgParams.dataIdxLeft = dataIdxLeft;
+    ecgParams.dataIdxRight = dataIdxRight;
+    config.data = extractDataToDatasets(this.props.currentFileIdx);
 
     let lbls = config.data.labels;
     console.log(`startIdx: ${dataIdxLeft}, endIdx: ${dataIdxRight}`);
     lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
     lbls.splice(0, newNumPoints);
-    console.log(lbls.length);
     config.data.labels = lbls;
-    ecgParams.dataIdxLeft = dataIdxLeft;
-    ecgParams.dataIdxRight = dataIdxRight;
     config.data.datasets.forEach((dataset, index) => {
       dataset.data = dataset.data.concat(options.completeDataset.datasets[index].data.slice(dataIdxLeft, dataIdxRight));
       dataset.data.splice(0, newNumPoints);
@@ -338,7 +354,7 @@ class ApexChart extends React.Component {
             width={"100%"} 
             options={options}
             plugins={annotationLinePlugin}
-            data={extractAllDataToDatasets(options)} />
+            data={initialData} />
         </div>
         <div className={styles['tools-box']}>
           <select value={this.state.zoom_value} onChange={this.handleZoomChange}>

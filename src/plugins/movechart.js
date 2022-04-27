@@ -74,24 +74,24 @@ const movechart = [
         ctx.closePath();
   
         // moveable bar
-        const min = ecgParams.dataIdxLeft;
-        let startingPoint = min * (width / datasets[0].data.length) + left + 15;
-        // console.log(`${startingPoint} = ${left} + 15 + ${min} * (${width} / ${datasets[0].data.length})`);
-        const barWidth = (ecgParams.numPointsOnChart / datasets[0].data.length) * (width - 30) ;
-        // console.log(`${barWidth} = (${width} - 30) / ${datasets[0].data.length} * ${ecgParams.numPointsOnChart}`);
-        const totalWidth = startingPoint + barWidth;
-        if (startingPoint < left + 15) {
-          startingPoint = left + 15;
+        if(datasets.length > 0) {
+          const min = ecgParams.dataIdxLeft;
+          let startingPoint = min * (width / datasets[0].data.length) + left + 15;
+          const barWidth = (ecgParams.numPointsOnChart / datasets[0].data.length) * (width - 30) ;
+          const totalWidth = startingPoint + barWidth;
+          if (startingPoint < left + 15) {
+            startingPoint = left + 15;
+          }
+          if (totalWidth > width) {
+            startingPoint = right - 30 - barWidth;
+          }
+    
+          ctx.beginPath();
+          ctx.fillStyle = 'grey'; 
+          ctx.rect(startingPoint, bottom + 60, barWidth, 15);
+          ctx.fill();
+          ctx.closePath();
         }
-        if (totalWidth > width) {
-          startingPoint = right - 30 - barWidth;
-        }
-  
-        ctx.beginPath();
-        ctx.fillStyle = 'grey'; 
-        ctx.rect(startingPoint, bottom + 60, barWidth, 15);
-        ctx.fill();
-        ctx.closePath();
       }
     }
   ];

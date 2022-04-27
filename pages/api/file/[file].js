@@ -6,10 +6,11 @@ let fileNames = [];
 
 export default async (req, res) => {
     const { query: { file } } = req;
-
     getFileNames([], (recordings) => {
-        if (recordings.includes(file)) {
+        const parsedFileIdx = parseInt(file);
+        if (!isNaN(parsedFileIdx) && parsedFileIdx < recordings.length) {
             let recordingData = {};
+            const file = recordings[parsedFileIdx];
             fs.readFile(dirPath + file, (err, data) => {
                 if (err) throw err;
                 recordingData = JSON.parse(data);
@@ -23,7 +24,7 @@ export default async (req, res) => {
             return res.status(404).json({
                 status: 404,
                 message: 'Not Found'
-              });
+            });
         }
     });
 }
