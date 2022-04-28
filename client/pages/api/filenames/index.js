@@ -1,5 +1,5 @@
 const fs = require('fs');
-const dirPath = './../recordings';
+const dirPath = '~/../data/recordings/';
 
 export function getFileNames(arr, callback) {
     // read recording file names

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const dirPath = '../annotations';
+const dirPath = '~/../data/annotations/';
 
 export function getAnnotationNames(arr, callback) {
     // read recording file names
