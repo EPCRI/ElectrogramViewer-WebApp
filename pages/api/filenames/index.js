@@ -4,9 +4,11 @@ const dirPath = './data/recordings';
 export function getFileNames(arr, callback) {
     // read recording file names
     fs.readdir(dirPath, (err, files) => {
+        console.log("getFileNames()");
         files.forEach(file => {
             arr.push(file);
         });
+        console.log("got file names");
         callback(arr);
     });
 }
