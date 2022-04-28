@@ -19,7 +19,6 @@ class ChartWindow extends React.Component {
       return (
         <div className={styles.row}>
           <div className={`${styles.column} ${styles.left}`}>
-            Signal
             {traceLeads.map((item, index) => {return <div key={index} className={styles.leadItem}>{item}</div>})}
           </div>
           <div className={`${styles.column} ${styles.middle}`}>

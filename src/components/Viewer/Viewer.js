@@ -2,7 +2,7 @@ import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
 import { getFileNames, getAnnotationData } from '../../utils/fileIO';
-import './Viewer.module.css';
+import styles from './Viewer.module.css';
 
 class Viewer extends React.Component {
   constructor(props) {
@@ -71,8 +71,8 @@ class Viewer extends React.Component {
 
   render(){
     return (
-      <div className="App">
-        <h1>EPCRI Elecrogram Viewer</h1>
+      <div className={styles['viewer']} >
+        <h1 className={styles['title']}>EPCRI Elecrogram Viewer</h1>
         <FileUI 
           annotations={this.state.annotations}
           changeFile={this.changeFile}
