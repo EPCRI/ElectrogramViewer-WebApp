@@ -1,12 +1,18 @@
 const fs = require('fs');
-const dirPath = '~/../data/annotations/';
+const dirPath = '../data/recordings/';
 
-export function getAnnotationNames(arr, callback) {
+export function getFileNames(arr, callback) {
     // read recording file names
+    console.log("DIRPATH HERE");
+    console.log(dirPath);
     fs.readdir(dirPath, (err, files) => {
+        console.log("getFileNames()");
+        console.log(err);
+        console.log(files);
         files.forEach(file => {
             arr.push(file);
         });
+        console.log("got file names");
         callback(arr);
     });
 }
@@ -19,11 +25,11 @@ export default (req, res) => {
         switch (method) {
           case 'GET':
             const { query: { id } } = req;
-            getAnnotationNames([], (annotationfiles) => {
+            getFileNames([], (recordings) => {
                 res.status(200).json({
                     method: 'GET', 
-                    endpoint: 'annotationnames',
-                    files: annotationfiles
+                    endpoint: 'filenames',
+                    files: recordings
                 });
             });
             break;

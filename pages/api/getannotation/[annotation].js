@@ -1,8 +1,8 @@
 const fs = require('fs');
 import { getFileNames } from '../filenames';
 import { getAnnotationNames } from '../annotationnames';
-const dirPath = '~/../data/recordings/';
-const annotationPath = '~/../data/annotations/';
+const dirPath = '../data/recordings/';
+const annotationPath = '../data/annotations/';
 
 
 export default (req, res) => {

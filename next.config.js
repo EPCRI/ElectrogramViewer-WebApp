@@ -5,5 +5,6 @@ module.exports = {
         ...config.resolve.alias,
         '~': __dirname,
       };
+      return config
     }
 }

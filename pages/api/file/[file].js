@@ -1,7 +1,7 @@
 // [files].js
 import { getFileNames } from '../filenames';
 const fs = require('fs');
-const dirPath = '~/../data/recordings/';
+const dirPath = '../data/recordings/';
 let fileNames = [];
 
 export default async (req, res) => {
