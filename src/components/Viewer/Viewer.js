@@ -1,7 +1,7 @@
 import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
-import { getFileNames } from '../../utils/fileIO';
+import { getFileNames, getAnnotationData } from '../../utils/fileIO';
 import './Viewer.module.css';
 
 class Viewer extends React.Component {
@@ -42,9 +42,12 @@ class Viewer extends React.Component {
     this.setState({annotations: annotations});
   }
 
-  changeFile (fileIdx) {
+  async changeFile (fileIdx) {
     console.log(`Changing file to ${fileIdx}`);
-    this.setState({currentFileIdx: fileIdx});
+    this.setState({
+      currentFileIdx: fileIdx,
+      annotations: []
+    });
   }
 
   removeAnnotation (timeCreated) {
@@ -52,7 +55,7 @@ class Viewer extends React.Component {
   }
 
   componentDidUpdate() {
-    // console.log(this.state.annotations);
+    console.log(this.state.annotations);
     // console.log(this.state.allFiles);
   }
 
@@ -68,12 +71,11 @@ class Viewer extends React.Component {
   }
 
   render(){
-    console.log("currentFileIdx: " + this.state.currentFileIdx);
     return (
       <div className="App">
         <h1>EPCRI Elecrogram Viewer</h1>
         <FileUI 
-          annotations={this.annotations}
+          annotations={this.state.annotations}
           changeFile={this.changeFile}
           setFileWasUpdated={this.setFileWasUpdated}
           currentFileIdx={this.state.currentFileIdx}/>

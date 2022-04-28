@@ -1,13 +1,13 @@
-class AnnotationLine {
+export class AnnotationLine {
 
-  constructor(chart, idx1) {
-    this.completed = false;
-    this.timeCreated = Date.now();
-    this.comment = '';
+  constructor(chart, idx1, idx2 = idx1, completed = false, timeCreated = Date.now(), comment = '') {
+    this.completed = completed;
+    this.timeCreated = timeCreated;
+    this.comment = comment;
     this.idx1 = idx1;
     this.t1 = chart.config.options.completeDataset.labels[this.idx1];
-    this.idx2 = idx1;
-    this.t2 = chart.config.options.completeDataset.labels[this.idx1];
+    this.idx2 = idx2;
+    this.t2 = chart.config.options.completeDataset.labels[this.idx2];
   }
 
   draw(chart) {
@@ -111,9 +111,18 @@ const annotationLinePlugin = {
 
   afterDraw(chart, args, pluginOptions) {
     const { ctx, chartArea: {left, right, top, bottom, width, height} } = chart;
+    const corsair = chart.config.options.plugins.corsair;
+    const { draw } = corsair;
     const datasets = chart.config.options.completeDataset.datasets;
-    const annotations = chart.config.options.plugins.corsair.annotations;
+    const annotations = corsair.annotations;
     const ecgParams = chart.config.options.electrogramParams;
+
+    // check to make sure annotations have been instantiated as AnnotationLine class objects
+    if (!AnnotationLine.prototype.isPrototypeOf(annotations[0])) {
+      // console.log("Can't draw yet");
+      return;
+    }
+
     annotations.forEach(element => {
       if (element.idx1 > ecgParams.dataIdxLeft && element.idx2 < ecgParams.dataIdxRight) {
         element.draw(chart);

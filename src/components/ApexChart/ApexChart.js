@@ -10,8 +10,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { getFileData } from '../../utils/fileIO';
-import annotationLinePlugin from '../../plugins/annotationline';
+import { getFileData, getAnnotationData } from '../../utils/fileIO';
+import annotationLinePlugin, { AnnotationLine } from '../../plugins/annotationline';
 import movechart from '../../plugins/movechart';
 import styles from './ApexChart.module.css';
 
@@ -267,7 +267,6 @@ class ApexChart extends React.Component {
 
   async componentDidMount() {
     console.log('componentDidMount()');
-    console.log(this.props.fileWasUpdated);
     window.setTimeout(() => {
       this.updateAnnotations();
       this.updateChartFile();
@@ -281,8 +280,9 @@ class ApexChart extends React.Component {
     window.setTimeout(() => {
       this.updateAnnotations();
       if (this.props.fileWasUpdated) { 
-        this.updateChartFile(); 
         this.props.setFileWasUpdated(false);
+        console.log("File was Updated");
+        this.updateChartFile(); 
       }
       this.myChartRef.current.update('none');
     })
@@ -293,12 +293,34 @@ class ApexChart extends React.Component {
     options.electrogramParams.dataIdxLeft = 0;
     options.electrogramParams.dataIdxRight = 10000;
     options.electrogramParams.numPointsOnChart = 10000;
+    this.myChartRef.current.config.options = options;
+    this.setState({zoom_value: 2});
     try {
+      // update datasets
       await extractAllDataToDatasets(this.props.currentFileIdx);
       const currentSliceData = extractDataToDatasets();
       this.myChartRef.current.config.data = currentSliceData;
-      this.myChartRef.current.config.options = options;
-      this.setState({zoom_value: 2});
+
+      // update annotations
+      let jsonData = await getAnnotationData(this.props.currentFileIdx);
+      let annotations = [];
+      if (jsonData.fileExists) { 
+        let annotationJSON = jsonData.data.annotations;
+        annotationJSON.forEach(element => {
+          const loadedAnnotations = new AnnotationLine(
+            this.myChartRef.current, 
+            element.idx1,
+            element.idx2,
+            true,
+            element.timeCreated,
+            element.comment
+          );
+          annotations.push();
+          this.props.addAnnotation(loadedAnnotations);
+        })
+      }
+      options.plugins.corsair.annotations = annotations;
+
       this.myChartRef.current.update('none');
     } catch (err) {
       console.log(err);
@@ -354,7 +376,6 @@ class ApexChart extends React.Component {
   }
 
   render() {
-
     return (
       <div className={styles.chartcontainer}>
         <div style={{height: '100%', width: '100%'}}>

@@ -8,11 +8,9 @@ const annotationPath = './data/annotations/';
 export default (req, res) => {
     return new Promise( resolve => {
         const { method, body } = req;
-        console.log(method);
         switch (method) {
           case 'POST':
             console.log("API: postannotation");
-            console.log(body);
             const annotationFileIdx = body.fileIdx;
             getFileNames([], (files) => {
                 const parsedFileIdx = parseInt(annotationFileIdx);

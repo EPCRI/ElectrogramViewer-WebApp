@@ -7,7 +7,7 @@ class FileUI extends React.Component {
         super(props);
         this.state = {
             files: [],
-            formFile: "",
+            formFileIdx: 0,
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleLoad = this.handleLoad.bind(this);
@@ -17,7 +17,7 @@ class FileUI extends React.Component {
     async componentDidMount() {
         try {
             let fileNames = await getFileNames();
-            this.setState({ files: fileNames, formFile: fileNames[0] });
+            this.setState({ files: fileNames, formFileIdx: 0 });
         } catch (err) {
             console.log(err);
         }
@@ -27,18 +27,20 @@ class FileUI extends React.Component {
         event.preventDefault();
         const fileIdx = event.target.value
         console.log(fileIdx);
-        this.setState({formFile: fileIdx});
+        this.setState({formFileIdx: fileIdx});
     }
 
     handleLoad(event) {
         event.preventDefault();
-        const fileName = this.state.formFile;
+        const fileName = this.state.formFileIdx;
+        console.log(fileName);
         this.props.changeFile(fileName);
         this.props.setFileWasUpdated(true);
     }
 
     async handleSave(event) {
         event.preventDefault();
+        console.log(this.props.annotations);
         const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations);
         if (response.result === "successful") {
             alert("Successfully saved file");

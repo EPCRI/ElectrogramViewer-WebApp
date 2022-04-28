@@ -28,7 +28,6 @@ export const getFileData = async (fileIdx) => {
     }
 
     const data = await response.json();
-    console.log(data);
     return data;
 }
 
@@ -61,7 +60,6 @@ export const getAnnotationData = async (fileIdx) => {
     }
 
     const data = await response.json();
-    console.log(data);
     return data;
 }
 

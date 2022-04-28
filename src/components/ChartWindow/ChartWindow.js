@@ -8,6 +8,11 @@ const traceLeads = ['I','II','III','aVR','aVL','aVF','V1','V2','V3','V4','V5','V
 class ChartWindow extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props);
+  }
+
+  componentDidUpdate() {
+    console.log(this.props.annotations);
   }
 
   render() {
