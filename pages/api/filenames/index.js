@@ -5,6 +5,8 @@ export function getFileNames(arr, callback) {
     // read recording file names
     fs.readdir(dirPath, (err, files) => {
         console.log("getFileNames()");
+        console.log(err);
+        console.log(files);
         files.forEach(file => {
             arr.push(file);
         });
