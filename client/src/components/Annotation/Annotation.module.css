@@ -1,0 +1,48 @@
+.annotation-column {
+    float: left;
+    padding: 2px;
+    height: 5vh;
+    background-color:grey;
+    outline: black solid 1px;
+}
+  
+.ann-left{
+    width: 35%;
+    background-color:#aaa;
+    flex-direction: column;
+    font-size: small;
+    vertical-align:middle;
+    line-height: 5vh;
+}
+
+.ann-middle {
+    width: 40%;
+    display: flex
+}
+
+.input-box {
+    width: 100%;
+    margin: 1px;
+}
+
+.ann-right{
+    width: 20%;
+}
+
+.annotation-row{
+    margin: auto;
+}
+
+/* Clear floats after the columns */
+.annotation-row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.comment-button {
+    text-align: center;
+    width: 50%;
+    height: 100%;
+}
+  

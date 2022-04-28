@@ -1,0 +1,60 @@
+/* * {
+    box-sizing: border-box;
+} */
+
+/* Create three unequal columns that floats next to each other */
+.column {
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 70vh;
+}
+  
+.left{
+    width: 5%;
+    background-color:#aaa;
+    flex-direction: column;
+    align-items: stretch;
+    display: flex;
+    justify-content: space-between;
+    height: 56vh;
+    padding-top: 10px;
+}
+
+.left > div {
+    width: auto;
+    font-size: 1.5rem;
+    align-content: center;
+    block-size: max-content;
+}
+
+.middle {
+    width: 70%;
+    background-color:white;
+    overflow: auto;
+    display: flex;
+}
+
+.right{
+    width: 20%;
+    background-color: whitesmoke;
+    overflow-y: scroll;
+}
+
+.right > div {
+    margin-top: .5vh;
+}
+
+.row{
+    width: 100vw;
+    min-width: 90vw;
+    margin: auto;
+}
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
