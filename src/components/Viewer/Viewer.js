@@ -27,9 +27,8 @@ class Viewer extends React.Component {
 
   addAnnotation (annotation) {
     console.log("\naddAnnotation()");
-    console.log(annotation);
+    // console.log(annotation);
     this.setState({annotations: [...this.state.annotations, annotation]});
-    console.log('\n');
   }
 
   addComment (timeCreated, comment) {

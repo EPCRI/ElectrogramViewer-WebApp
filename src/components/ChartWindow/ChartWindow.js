@@ -12,7 +12,7 @@ class ChartWindow extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.annotations);
+    // console.log(this.props.annotations);
   }
 
   render() {

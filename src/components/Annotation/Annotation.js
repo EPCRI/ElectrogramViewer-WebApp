@@ -7,7 +7,7 @@ export class Annotation extends React.Component {
         super(props);
         this.state = {
             passedInComment: this.props.annotation.comment,
-            currentComment: ''
+            currentComment: this.props.annotation.comment || ''
         };
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.handleCommentClick = this.handleCommentClick.bind(this);

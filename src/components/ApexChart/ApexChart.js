@@ -59,7 +59,7 @@ function scrollButtonCheck(event) {
   const numPointsOnChart = myChart.config.options.electrogramParams.numPointsOnChart;
   let dataIdxLeft = myChart.config.options.electrogramParams.dataIdxLeft;
   let dataIdxRight = myChart.config.options.electrogramParams.dataIdxRight;
-  console.log(`INITIAL - left: ${dataIdxLeft}, right: ${dataIdxRight}, numPoints: ${numPointsOnChart}`);
+  // console.log(`INITIAL - left: ${dataIdxLeft}, right: ${dataIdxRight}, numPoints: ${numPointsOnChart}`);
 
   if(x >= right - 30 && x <= right && y >= height / 2 + top - 15 && y <= height / 2 + top + 15) {
     let lbls = myChart.config.data.labels;
@@ -81,7 +81,6 @@ function scrollButtonCheck(event) {
       console.log(`1 - left: ${dataIdxLeft}, right: ${dataIdxRight}, numPoints: ${numPointsOnChart}`);
       lbls = lbls.concat(labels.slice(dataIdxLeft, dataIdxRight));
       lbls.splice(0, numPointsOnChart + 1);
-      console.log(lbls);
       lbls = lbls.map(element => element.toFixed(2));
       myChart.config.data.labels = lbls;
 
@@ -276,7 +275,7 @@ class ApexChart extends React.Component {
   }
 
   async componentDidUpdate() {
-    console.log('componentDidUpdate()');
+    // console.log('componentDidUpdate()');
     window.setTimeout(() => {
       this.updateAnnotations();
       if (this.props.fileWasUpdated) { 

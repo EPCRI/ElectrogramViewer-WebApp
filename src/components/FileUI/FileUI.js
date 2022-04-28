@@ -26,14 +26,12 @@ class FileUI extends React.Component {
     handleChange(event) {
         event.preventDefault();
         const fileIdx = event.target.value
-        console.log(fileIdx);
         this.setState({formFileIdx: fileIdx});
     }
 
     handleLoad(event) {
         event.preventDefault();
         const fileName = this.state.formFileIdx;
-        console.log(fileName);
         this.props.changeFile(fileName);
         this.props.setFileWasUpdated(true);
     }
