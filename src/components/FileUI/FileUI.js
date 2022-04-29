@@ -25,7 +25,7 @@ class FileUI extends React.Component {
     }
 
     componentDidUpdate() {
-        this.formFileIdx = this.props.currentFileIdx;
+        this.setState = {formFileIdx: this.props.currentFileIdx};
     }
 
     handleChange(event) {
