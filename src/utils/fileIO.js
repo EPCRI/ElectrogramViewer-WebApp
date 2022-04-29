@@ -1,5 +1,5 @@
 
-const server = "http://ec2-3-15-9-234.us-east-2.compute.amazonaws.com:3000";
+const server = "https://ecgviewer-api.com";
 // const server = "http://localhost:3000";
 
 export const getFileNames = async () => {
