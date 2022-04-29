@@ -12,6 +12,7 @@ class FileUI extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleLoad = this.handleLoad.bind(this);
         this.handleSave = this.handleSave.bind(this);
+        this.handleNext = this.handleNext.bind(this);
     }
 
     async componentDidMount() {
@@ -31,8 +32,16 @@ class FileUI extends React.Component {
 
     handleLoad(event) {
         event.preventDefault();
-        const fileName = this.state.formFileIdx;
-        this.props.changeFile(fileName);
+        const fileIdx = this.state.formFileIdx;
+        this.props.changeFile(fileIdx);
+        this.props.setFileWasUpdated(true);
+    }
+
+    handleNext(event) {
+        event.preventDefault();
+        const fileIdx = this.props.currentFileIdx;
+        const newFileIdx = fileIdx + 1;
+        this.props.changeFile(newFileIdx);
         this.props.setFileWasUpdated(true);
     }
 
@@ -59,7 +68,7 @@ class FileUI extends React.Component {
                     </select>
                     <button onClick={this.handleLoad}>Load</button>
                     <button onClick={this.handleSave}>Save</button>
-                    <button>Next</button>
+                    <button onClick={this.handleNext}>Next</button>
                 </div>
             </div>
         )
