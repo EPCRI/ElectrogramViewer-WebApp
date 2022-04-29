@@ -1,6 +1,9 @@
 
+const server = "http://ec2-3-15-9-234.us-east-2.compute.amazonaws.com:3000";
+// const server = "http://localhost:3000";
+
 export const getFileNames = async () => {
-    const response = await fetch("/api/filenames", {
+    const response = await fetch(server + "/filenames", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -16,7 +19,7 @@ export const getFileNames = async () => {
 }
 
 export const getFileData = async (fileIdx) => {
-    const response = await fetch("/api/file/" + fileIdx, {
+    const response = await fetch(server + "/file/" + fileIdx, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -32,7 +35,7 @@ export const getFileData = async (fileIdx) => {
 }
 
 export const getAnnotationNames = async () => {
-    const response = await fetch("/api/annotationnames", {
+    const response = await fetch(server + "/annotationnames", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -48,7 +51,7 @@ export const getAnnotationNames = async () => {
 }
 
 export const getAnnotationData = async (fileIdx) => {
-    const response = await fetch("/api/getannotation/" + fileIdx, {
+    const response = await fetch(server + "/annotation/" + fileIdx, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -69,7 +72,7 @@ export const saveAnnotationData = async (fileIdx, annotations) => {
         annotations
     };
     console.log("saveAnnotationData()");
-    const response = await fetch("/api/postannotation", {
+    const response = await fetch(server + "/annotation", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
