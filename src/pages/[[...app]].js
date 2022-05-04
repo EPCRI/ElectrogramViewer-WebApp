@@ -1,6 +1,6 @@
 // pages/[[...app]].js
 import React, { useState, useEffect } from 'react';
-import Viewer from '../src/components/Viewer/Viewer';
+import Viewer from '../components/Viewer/Viewer';
 // import './styles.css'
 
 function App() {

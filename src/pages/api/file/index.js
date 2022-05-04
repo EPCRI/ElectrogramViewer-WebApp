@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-export default (req, res) => {
+export default function handler(req, res) {
     const { method } = req;
   
     switch (method) {

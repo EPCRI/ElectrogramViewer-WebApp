@@ -1,35 +1,29 @@
 const fs = require('fs');
-const dirPath = '../data/recordings/';
+const dirPath = '../data/annotations/';
 
-export function getFileNames(arr, callback) {
+export function getAnnotationNames(arr, callback) {
     // read recording file names
-    console.log("DIRPATH HERE");
-    console.log(dirPath);
     fs.readdir(dirPath, (err, files) => {
-        console.log("getFileNames()");
-        console.log(err);
-        console.log(files);
         files.forEach(file => {
             arr.push(file);
         });
-        console.log("got file names");
         callback(arr);
     });
 }
 
 
-export default (req, res) => {
+export default function handler(req, res) {
     return new Promise( resolve => {
         const { method } = req;
   
         switch (method) {
           case 'GET':
             const { query: { id } } = req;
-            getFileNames([], (recordings) => {
+            getAnnotationNames([], (annotationfiles) => {
                 res.status(200).json({
                     method: 'GET', 
-                    endpoint: 'filenames',
-                    files: recordings
+                    endpoint: 'annotationnames',
+                    files: annotationfiles
                 });
             });
             break;

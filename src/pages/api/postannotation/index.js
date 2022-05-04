@@ -5,7 +5,7 @@ const dirPath = '../data/recordings/';
 const annotationPath = '../data/annotations/';
 
 
-export default (req, res) => {
+export default function handler(req, res) {
     return new Promise( resolve => {
         const { method, body } = req;
         switch (method) {

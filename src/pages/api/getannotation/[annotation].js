@@ -5,7 +5,7 @@ const dirPath = '../data/recordings/';
 const annotationPath = '../data/annotations/';
 
 
-export default (req, res) => {
+export default function handler(req, res) {
     const { query: { annotation } } = req;
     getFileNames([], (recordings) => {
         getAnnotationNames([], (annotations) => {

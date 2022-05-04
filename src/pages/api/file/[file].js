@@ -4,7 +4,7 @@ const fs = require('fs');
 const dirPath = '../data/recordings/';
 let fileNames = [];
 
-export default async (req, res) => {
+export default async function handler(req, res) {
     const { query: { file } } = req;
     getFileNames([], (recordings) => {
         const parsedFileIdx = parseInt(file);
