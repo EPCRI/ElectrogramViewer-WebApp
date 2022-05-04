@@ -3,12 +3,12 @@ const dirPath = '../data/recordings/';
 
 export function getFileNames(arr, callback) {
     // read recording file names
-    console.log("DIRPATH HERE");
-    console.log(dirPath);
+    // console.log("DIRPATH HERE");
+    // console.log(dirPath);
     fs.readdir(dirPath, (err, files) => {
-        console.log("getFileNames()");
-        console.log(err);
-        console.log(files);
+        // console.log("getFileNames()");
+        // console.log(err);
+        // console.log(files);
         files.forEach(file => {
             arr.push(file);
         });

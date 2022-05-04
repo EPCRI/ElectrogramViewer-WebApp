@@ -1,7 +1,25 @@
 .file-input-wrapper{
-    width: 35vw;
-    height: 3vw;
-    margin-left: 5vw;
+    width: fit-content;
+    height: fit-content;
+    margin-left: 6%;
     border-style: solid;
-    padding: 10px;
+    padding: .5%;
+}
+
+.file-interface{
+    align-content: center;
+    display: flex;
+}
+
+.file-information{
+    align-content: center;
+    display: flex;
+}
+
+.parameters{
+    margin-left: 4%;
+}
+
+.file-wrapper{
+    display: flex;
 }

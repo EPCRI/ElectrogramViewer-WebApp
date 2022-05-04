@@ -265,7 +265,7 @@ class ApexChart extends React.Component {
   }
 
   async componentDidMount() {
-    console.log('componentDidMount()');
+    // console.log('componentDidMount()');
     window.setTimeout(() => {
       this.updateAnnotations();
       this.updateChartFile();
@@ -322,8 +322,9 @@ class ApexChart extends React.Component {
         })
       }
       options.plugins.corsair.annotations = annotations;
-
       this.myChartRef.current.update('none');
+      console.log("CHART UPDATED");
+      this.props.setLoaderVisible(false);
     } catch (err) {
       console.log(err);
     }

@@ -1,7 +1,7 @@
 import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
 import FileUI from '../FileUI/FileUI';
-import { getFileNames, getAnnotationData } from '../../utils/fileIO';
+import { getFileNames, getAnnotationNames } from '../../utils/fileIO';
 import styles from './Viewer.module.css';
 
 class Viewer extends React.Component {
@@ -12,17 +12,31 @@ class Viewer extends React.Component {
       currentFileIdx: 0,
       fileWasUpdated:true,
       allFiles: [],
+      annotationFiles: [],
       annotations: [],
+      loaderVisible: true,
     }
     this.addComment = this.addComment.bind(this);
     this.addAnnotation = this.addAnnotation.bind(this);
+    this.addAnnotationFile = this.addAnnotationFile.bind(this);
     this.removeAnnotation = this.removeAnnotation.bind(this);
     this.changeFile = this.changeFile.bind(this);
     this.setFileWasUpdated = this.setFileWasUpdated.bind(this);
+    this.setLoaderVisible = this.setLoaderVisible.bind(this);
   }
 
   setFileWasUpdated(updatedBool) {
     this.setState({fileWasUpdated: updatedBool});
+  }
+
+  setLoaderVisible(visibleBool) {
+    this.setState({loaderVisible: visibleBool});
+  }
+
+  addAnnotationFile(file) {
+    const annArr = this.state.annotationFiles;
+    annArr.push(file);
+    this.setState({annotationFiles: annArr});
   }
 
   addAnnotation (annotation) {
@@ -60,9 +74,10 @@ class Viewer extends React.Component {
 
   async componentDidMount() {  
     try {
-      let fileNames = [];
-      fileNames = await getFileNames();
-      this.setState({ currentFileIdx: 0, allFiles: fileNames });
+      const fileNames = await getFileNames();
+      const annotationNames = await getAnnotationNames();
+      console.log(annotationNames)
+      this.setState({ currentFileIdx: 0, allFiles: fileNames, annotationFiles: annotationNames });
     } catch(err) {
       console.log(err);
     }
@@ -75,17 +90,23 @@ class Viewer extends React.Component {
         <h1 className={styles['title']}>EPCRI Elecrogram Viewer</h1>
         <FileUI 
           annotations={this.state.annotations}
+          addAnnotationFile={this.addAnnotationFile}
           changeFile={this.changeFile}
+          setLoaderVisible={this.setLoaderVisible}
+          loaderVisible={this.state.loaderVisible}
+          fileWasUpdated={this.state.fileWasUpdated}
           setFileWasUpdated={this.setFileWasUpdated}
+          annotationFiles={this.state.annotationFiles}
           currentFileIdx={this.state.currentFileIdx}/>
         <ChartWindow 
           currentFileIdx={this.state.currentFileIdx}
           annotations={this.state.annotations} 
           fileWasUpdated={this.state.fileWasUpdated}
-          addAnnotation={this.addAnnotation} 
+          addAnnotation={this.addAnnotation}
           addComment={this.addComment}
           removeAnnotation={this.removeAnnotation}
-          setFileWasUpdated={this.setFileWasUpdated}/>
+          setFileWasUpdated={this.setFileWasUpdated}
+          setLoaderVisible={this.setLoaderVisible}/>
       </div>
     );
   }
