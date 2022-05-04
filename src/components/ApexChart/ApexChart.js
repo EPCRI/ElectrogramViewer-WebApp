@@ -301,9 +301,12 @@ class ApexChart extends React.Component {
       this.myChartRef.current.config.data = currentSliceData;
 
       // update annotations
+      console.log("getAnnotationData()");
       let jsonData = await getAnnotationData(this.props.currentFileIdx);
+      console.log("got jsonData");
       let annotations = [];
-      if (jsonData.fileExists) { 
+      if (jsonData && jsonData.fileExists) {
+        console.log("annotation file exists");
         let annotationJSON = jsonData.data.annotations;
         annotationJSON.forEach(element => {
           const loadedAnnotations = new AnnotationLine(

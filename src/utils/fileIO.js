@@ -1,6 +1,7 @@
 
-const server = "https://ecgviewer-api.com";
+// const server = "https://ecgviewer-api.com";
 // const server = "http://localhost:3000";
+const server = "/api";
 
 export const getFileNames = async () => {
     const response = await fetch(server + "/filenames", {
@@ -51,7 +52,7 @@ export const getAnnotationNames = async () => {
 }
 
 export const getAnnotationData = async (fileIdx) => {
-    const response = await fetch(server + "/annotation/" + fileIdx, {
+    const response = await fetch(server + "/getannotation/" + fileIdx, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -72,7 +73,7 @@ export const saveAnnotationData = async (fileIdx, annotations) => {
         annotations
     };
     console.log("saveAnnotationData()");
-    const response = await fetch(server + "/annotation", {
+    const response = await fetch(server + "/postannotation", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
