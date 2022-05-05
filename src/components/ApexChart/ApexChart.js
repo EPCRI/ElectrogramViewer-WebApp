@@ -411,6 +411,7 @@ class ApexChart extends React.Component {
                 corsair.drawingLine = false;
                 console.log("Adding");
                 console.log("Length: " + corsair.annotations.length);
+                this.props.setEdited(true);
                 this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
               }
             }}>✓</button>

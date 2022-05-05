@@ -16,6 +16,7 @@ class Viewer extends React.Component {
       annotationFiles: [],
       annotations: [],
       loaderVisible: true,
+      edited: true,
     }
     this.addComment = this.addComment.bind(this);
     this.addAnnotation = this.addAnnotation.bind(this);
@@ -24,6 +25,7 @@ class Viewer extends React.Component {
     this.changeFile = this.changeFile.bind(this);
     this.setFileWasUpdated = this.setFileWasUpdated.bind(this);
     this.setLoaderVisible = this.setLoaderVisible.bind(this);
+    this.setEdited = this.setEdited.bind(this);
   }
 
   setFileWasUpdated(updatedBool) {
@@ -32,6 +34,10 @@ class Viewer extends React.Component {
 
   setLoaderVisible(visibleBool) {
     this.setState({loaderVisible: visibleBool});
+  }
+
+  setEdited(editedBool) {
+    this.setState({edited: editedBool});
   }
 
   addAnnotationFile(file) {
@@ -100,7 +106,9 @@ class Viewer extends React.Component {
           fileWasUpdated={this.state.fileWasUpdated}
           setFileWasUpdated={this.setFileWasUpdated}
           annotationFiles={this.state.annotationFiles}
-          currentFileIdx={this.state.currentFileIdx}/>
+          currentFileIdx={this.state.currentFileIdx}
+          edited={this.state.edited}
+          setEdited={this.setEdited}/>
         <ChartWindow
           currentFileIdx={this.state.currentFileIdx}
           annotations={this.state.annotations}
@@ -110,7 +118,8 @@ class Viewer extends React.Component {
           removeAnnotation={this.removeAnnotation}
           setFileWasUpdated={this.setFileWasUpdated}
           loaderVisible={this.state.loaderVisible}
-          setLoaderVisible={this.setLoaderVisible} />
+          setLoaderVisible={this.setLoaderVisible}
+          setEdited={this.setEdited} />
         <div className={`${styles.annotations}`}>
           {this.state.annotations.map((element, index) => (
             <Annotation

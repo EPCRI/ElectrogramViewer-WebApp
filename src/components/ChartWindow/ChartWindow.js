@@ -30,7 +30,8 @@ class ChartWindow extends React.Component {
               fileWasUpdated={this.props.fileWasUpdated}
               setFileWasUpdated={this.props.setFileWasUpdated}
               loaderVisible={this.props.loaderVisible}
-              setLoaderVisible={this.props.setLoaderVisible}/>
+              setLoaderVisible={this.props.setLoaderVisible}
+              setEdited={this.props.setEdited}/>
           </div>
         </div>
       );
