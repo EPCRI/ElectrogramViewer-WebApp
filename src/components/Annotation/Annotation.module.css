@@ -1,23 +1,24 @@
 .annotation-column {
     float: left;
     padding: 2px;
-    height: 5vh;
+    height: 3vh;
     background-color:grey;
     outline: black solid 1px;
 }
   
 .ann-left{
-    width: 35%;
+    width: 8%;
     background-color:#aaa;
     flex-direction: column;
     font-size: small;
     vertical-align:middle;
-    line-height: 5vh;
+    line-height: 3vh;
 }
 
 .ann-middle {
-    width: 40%;
+    width: 80%;
     display: flex
+    
 }
 
 .input-box {
@@ -26,7 +27,7 @@
 }
 
 .ann-right{
-    width: 20%;
+    width: 10%;
 }
 
 .annotation-row{

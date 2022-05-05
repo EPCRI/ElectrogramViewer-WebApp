@@ -17,6 +17,7 @@ export default function handler(req, res) {
                 if (parsedFileIdx !== undefined && !isNaN(parsedFileIdx) && parsedFileIdx < files.length) {
                     const file = files[parsedFileIdx];
                     console.log(annotationPath + file);
+                    body.filepath = file;
                     fs.writeFile(annotationPath + file, JSON.stringify(body), (err) => {
                         if (err) throw err;
                         console.log('Data written to file');

@@ -1,7 +1,6 @@
 .file-input-wrapper{
-    width: fit-content;
     height: fit-content;
-    margin-left: 6%;
+    margin-left: 3%;
     border-style: solid;
     padding: .5%;
 }
@@ -9,6 +8,7 @@
 .file-interface{
     align-content: center;
     display: flex;
+    width: 25%;
 }
 
 .file-information{
@@ -18,6 +18,13 @@
 
 .parameters{
     margin-left: 4%;
+}
+
+.parameters1{
+    margin-left: 4%;
+    font-size: larger;
+    vertical-align:middle;
+    line-height: 3vh;
 }
 
 .file-wrapper{

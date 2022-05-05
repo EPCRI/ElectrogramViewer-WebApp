@@ -14,6 +14,7 @@ class FileUI extends React.Component {
             IVD: '-',
             PacingBPM: '-',
             TrialRun: '-',
+            special: '',
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleLoad = this.handleLoad.bind(this);
@@ -34,7 +35,6 @@ class FileUI extends React.Component {
     annotationOptions() {
         const annotationFiles = this.props.annotationFiles;
         let optionsArr = [];
-        console.log(annotationFiles);
         if (this.state.files.length > 0) {
             optionsArr = this.state.files.map((file, index) => {
                 if (annotationFiles.includes(file)) {
@@ -48,18 +48,25 @@ class FileUI extends React.Component {
     }
 
     parseFileName(filename) {
-        const stringArr = filename.split('_');
-        const AVD = stringArr[stringArr.indexOf('AVD') + 1];
-        const VVD = stringArr[stringArr.indexOf('VVD') + 1];
-        const IVD = stringArr[stringArr.indexOf('IVD') + 1];
-        const trialRun = stringArr.at(-2);
-        const pacing = stringArr.at(-1).split('.')[0];
+        const stringArr = filename.toLowerCase().split('_');
+        const AVD = stringArr[stringArr.indexOf('avd') + 1];
+        const VVD = stringArr[stringArr.indexOf('vvd') + 1];
+        const IVD = stringArr[stringArr.indexOf('ivd') + 1];
+        const trialRun = stringArr.filter(element => element[0].toLowerCase() === 'x')[0];
+        let pacing = '';
+        if (stringArr.filter(element => element.toLowerCase().includes('bpm'))[0] === stringArr[stringArr.indexOf('bpm')]) {
+            pacing = stringArr[stringArr.indexOf('bpm') - 1]
+        } else {
+            pacing = stringArr.filter(element => element.toLowerCase().includes('bpm'))[0].split('bpm')[0];
+        }
+        const special = stringArr[stringArr.indexOf('ONLY') - 1];
         this.setState({
-            AVD: AVD ? AVD : '-',
-            VVD: VVD ? VVD : '-',
-            IVD: IVD ? IVD : '-',
-            PacingBPM: pacing ? pacing : '-',
-            TrialRun: trialRun ? trialRun : '-'
+            AVD: AVD === stringArr[0] ? '-' : AVD,
+            VVD: VVD === stringArr[0] ? '-' : VVD,
+            IVD: IVD === stringArr[0] ? '-' : IVD,
+            PacingBPM: pacing,
+            TrialRun: trialRun ? trialRun : '-',
+            special: special === stringArr[0] ? '' : 'Pacing ' + special + ' only',
         })
     }
 
@@ -94,9 +101,7 @@ class FileUI extends React.Component {
         const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations);
         console.log(this.state.files[this.props.currentFileIdx]);
         this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
-        if (response.result === "successful") {
-            alert("Successfully saved file");
-        } else {
+        if (response.result !== "successful") {
             alert("Something went wrong");
         }
     }
@@ -107,7 +112,7 @@ class FileUI extends React.Component {
                 <div className={styles['file-input-wrapper']}>
                     <div>
                         <div className={styles['file-interface']}>
-                            <select value={this.props.currentFileIdx} onChange={this.handleChange}>
+                            <select styles={{width: "20%"}} value={this.props.currentFileIdx} onChange={this.handleChange}>
                                 {this.annotationOptions()}
                             </select>
                             <button onClick={this.handleLoad}>Load</button>
@@ -115,34 +120,27 @@ class FileUI extends React.Component {
                             <button onClick={this.handleNext}>Next</button>
                         </div>
                     </div>
-                    <div className={styles['file-information']}>
-                        <div className={styles['parameters']}>
-                            AVD: {this.state.AVD}  
-                        </div>  
-                        <div className={styles['parameters']}>
-                            VVD: {this.state.VVD}  
-                        </div>  
-                        <div className={styles['parameters']}>
-                            IVD: {this.state.IVD}  
-                        </div>  
-                        <div className={styles['parameters']}>
-                            Pacing BPM: {this.state.PacingBPM}
-                        </div>
-                        <div className={styles['parameters']}>
-                            Trial Run: {this.state.TrialRun}
-                        </div>
+                </div>
+                <div className={styles['file-information']}>
+                    {this.state.pacing && <div className={styles['parameters1']}>
+                        {this.state.special} 
+                    </div>  }
+                    <div className={styles['parameters']}>
+                        AVD: {this.state.AVD}  
+                    </div>  
+                    <div className={styles['parameters']}>
+                        VVD: {this.state.VVD}  
+                    </div>  
+                    <div className={styles['parameters']}>
+                        IVD: {this.state.IVD}  
+                    </div>  
+                    <div className={styles['parameters']}>
+                        Pacing Rate: {this.state.PacingBPM}
+                    </div>
+                    <div className={styles['parameters']}>
+                        Trial: {this.state.TrialRun}
                     </div>
                 </div>
-                {this.props.loaderVisible &&
-                    <div>
-                        <BallTriangle
-                            height="70"
-                            width="70"
-                            color="grey"
-                            ariaLabel="loading-indicator"
-                        />
-                    </div>
-                }
             </div>
         )
     }

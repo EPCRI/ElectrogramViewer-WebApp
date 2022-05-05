@@ -19,10 +19,12 @@
   text-decoration: underline;
   font-size: small;
   text-align: center;
+  margin: 8px;
 }
 
 .select-buttons {
   width: 50px;
+  background-color: cyan;
 }
 
 .confirm-buttons {

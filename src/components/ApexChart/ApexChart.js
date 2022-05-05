@@ -397,12 +397,11 @@ class ApexChart extends React.Component {
             <option value={2}>100</option>
             <option value={1}>67</option>
           </select>
-          <div className={styles['tools-box-name']}>Window</div>
+          <div className={styles['tools-box-name']}></div>
           <button className={styles['select-buttons']} onClick={() => {
             this.myChartRef.current.config.options.plugins.corsair.annotating = true;
             console.log(this.myChartRef.current.config.options.plugins.corsair);
-            }}>T1</button>
-          <button className={styles['select-buttons']}>T2</button>
+            }}>✎</button>
           <div>
             <button className={styles['confirm-buttons']} onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
@@ -424,12 +423,16 @@ class ApexChart extends React.Component {
               }
             }}>☓</button>
           </div>
-          {/* <div className='tools-box-name'>Point</div>
-          <button className='select-buttons'>✎</button>
-          <div>
-            <button className='confirm-buttons'>✓</button>
-            <button className='confirm-buttons'>☓</button>
-          </div> */}
+          {/* {this.props.loaderVisible &&
+            <div>
+              <BallTriangle
+                height="70"
+                width="70"
+                color="grey"
+                ariaLabel="loading-indicator"
+              />
+            </div>
+          } */}
         </div>
       </div>
     );

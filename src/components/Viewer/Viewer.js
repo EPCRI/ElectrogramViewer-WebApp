@@ -1,5 +1,6 @@
 import React from 'react';
 import ChartWindow from '../ChartWindow/ChartWindow';
+import { Annotation } from '../Annotation/Annotation';
 import FileUI from '../FileUI/FileUI';
 import { getFileNames, getAnnotationNames } from '../../utils/fileIO';
 import styles from './Viewer.module.css';
@@ -40,7 +41,7 @@ class Viewer extends React.Component {
   }
 
   addAnnotation (annotation) {
-    console.log("\naddAnnotation()");
+    // console.log("\naddAnnotation()");
     // console.log(annotation);
     this.setState({annotations: [...this.state.annotations, annotation]});
   }
@@ -68,7 +69,7 @@ class Viewer extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.state.annotations);
+    // console.log(this.state.annotations);
     // console.log(this.state.allFiles);
   }
 
@@ -76,7 +77,7 @@ class Viewer extends React.Component {
     try {
       const fileNames = await getFileNames();
       const annotationNames = await getAnnotationNames();
-      console.log(annotationNames)
+      // console.log(annotationNames)
       this.setState({ currentFileIdx: 0, allFiles: fileNames, annotationFiles: annotationNames });
     } catch(err) {
       console.log(err);
@@ -87,7 +88,9 @@ class Viewer extends React.Component {
   render(){
     return (
       <div className={styles['viewer']} >
-        <h1 className={styles['title']}>EPCRI Elecrogram Viewer</h1>
+        <div className={styles['title-container']}>
+          <h1 className={styles['title']}>EPCRI Elecrogram Viewer</h1>
+        </div>
         <FileUI 
           annotations={this.state.annotations}
           addAnnotationFile={this.addAnnotationFile}
@@ -98,15 +101,23 @@ class Viewer extends React.Component {
           setFileWasUpdated={this.setFileWasUpdated}
           annotationFiles={this.state.annotationFiles}
           currentFileIdx={this.state.currentFileIdx}/>
-        <ChartWindow 
+        <ChartWindow
           currentFileIdx={this.state.currentFileIdx}
-          annotations={this.state.annotations} 
+          annotations={this.state.annotations}
           fileWasUpdated={this.state.fileWasUpdated}
           addAnnotation={this.addAnnotation}
           addComment={this.addComment}
           removeAnnotation={this.removeAnnotation}
           setFileWasUpdated={this.setFileWasUpdated}
-          setLoaderVisible={this.setLoaderVisible}/>
+          setLoaderVisible={this.setLoaderVisible} />
+        <div className={`${styles.annotations}`}>
+          {this.state.annotations.map((element, index) => (
+            <Annotation
+              key={index}
+              annotation={element}
+              removeAnnotation={this.removeAnnotation}
+              addComment={this.addComment} />))}
+        </div>
       </div>
     );
   }

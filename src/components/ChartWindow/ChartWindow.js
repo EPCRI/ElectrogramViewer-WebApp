@@ -30,14 +30,6 @@ class ChartWindow extends React.Component {
               setFileWasUpdated={this.props.setFileWasUpdated}
               setLoaderVisible={this.props.setLoaderVisible}/>
           </div>
-          <div className={`${styles.column} ${styles.right}`}>
-            {this.props.annotations.map((element, index) => (
-              <Annotation 
-                key={index}
-                annotation={element} 
-                removeAnnotation={this.props.removeAnnotation}
-                addComment={this.props.addComment}/>))}
-          </div>
         </div>
       );
   }

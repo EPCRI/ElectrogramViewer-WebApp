@@ -27,6 +27,7 @@ export class Annotation extends React.Component {
 
     handleChange(event) {
         this.setState({currentComment: event.target.value});
+        this.props.addComment(this.props.annotation.timeCreated, this.state.currentComment);
     }
 
     render() {
