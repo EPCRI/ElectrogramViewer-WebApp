@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { BallTriangle } from  'react-loader-spinner';
 import { getFileData, getAnnotationData } from '../../utils/fileIO';
 import annotationLinePlugin, { AnnotationLine } from '../../plugins/annotationline';
 import movechart from '../../plugins/movechart';
@@ -380,8 +381,8 @@ class ApexChart extends React.Component {
 
   render() {
     return (
-      <div className={styles.chartcontainer}>
-        <div style={{height: '100%', width: '100%'}}>
+      <div className={styles.chartcontainer} >
+        <div style={this.props.loaderVisible ? {visibility: "hidden"} : {visibility: "visible", height: '100%', width: '100%'}}>
           <Line 
             ref={this.myChartRef}
             height={"100%"} 
@@ -423,8 +424,9 @@ class ApexChart extends React.Component {
               }
             }}>☓</button>
           </div>
-          {/* {this.props.loaderVisible &&
-            <div>
+        </div>
+        {this.props.loaderVisible &&
+            <div className={styles['loading-icon']}>
               <BallTriangle
                 height="70"
                 width="70"
@@ -432,8 +434,7 @@ class ApexChart extends React.Component {
                 ariaLabel="loading-indicator"
               />
             </div>
-          } */}
-        </div>
+          }
       </div>
     );
   }

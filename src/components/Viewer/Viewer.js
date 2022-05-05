@@ -109,6 +109,7 @@ class Viewer extends React.Component {
           addComment={this.addComment}
           removeAnnotation={this.removeAnnotation}
           setFileWasUpdated={this.setFileWasUpdated}
+          loaderVisible={this.state.loaderVisible}
           setLoaderVisible={this.setLoaderVisible} />
         <div className={`${styles.annotations}`}>
           {this.state.annotations.map((element, index) => (

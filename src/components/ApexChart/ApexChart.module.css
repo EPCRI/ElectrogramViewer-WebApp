@@ -31,3 +31,9 @@
   width: 25px;
   text-align: center;
 }
+
+.loading-icon {
+  position: absolute;
+  top: 40%;
+  right: 50%;
+}

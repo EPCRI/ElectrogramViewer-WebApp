@@ -59,14 +59,15 @@ class FileUI extends React.Component {
         } else {
             pacing = stringArr.filter(element => element.toLowerCase().includes('bpm'))[0].split('bpm')[0];
         }
-        const special = stringArr[stringArr.indexOf('ONLY') - 1];
+        const special = stringArr.indexOf('only') === -1 ? '' : stringArr[stringArr.indexOf('only') - 1];
+        console.log(special);
         this.setState({
             AVD: AVD === stringArr[0] ? '-' : AVD,
             VVD: VVD === stringArr[0] ? '-' : VVD,
             IVD: IVD === stringArr[0] ? '-' : IVD,
             PacingBPM: pacing,
             TrialRun: trialRun ? trialRun : '-',
-            special: special === stringArr[0] ? '' : 'Pacing ' + special + ' only',
+            special: special,
         })
     }
 
@@ -122,8 +123,9 @@ class FileUI extends React.Component {
                     </div>
                 </div>
                 <div className={styles['file-information']}>
-                    {this.state.pacing && <div className={styles['parameters1']}>
-                        {this.state.special} 
+                    {this.state.special && 
+                    <div className={styles['parameters1']}>
+                        {this.state.special.toUpperCase()}
                     </div>  }
                     <div className={styles['parameters']}>
                         AVD: {this.state.AVD}  
