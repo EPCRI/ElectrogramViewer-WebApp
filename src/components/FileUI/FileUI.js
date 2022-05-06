@@ -89,7 +89,8 @@ class FileUI extends React.Component {
         this.parseFileName(this.state.files[fileIdx]);
     }
 
-    handleNext(event) {
+    async handleNext(event) {
+        await this.handleSave(event);
         event.preventDefault();
         const fileIdx = parseInt(this.props.currentFileIdx);
         const newFileIdx = fileIdx + 1;
@@ -103,9 +104,7 @@ class FileUI extends React.Component {
 
     async handleSave(event) {
         event.preventDefault();
-        // console.log(this.props.annotations);
         const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations);
-        // console.log(this.state.files[this.props.currentFileIdx]);
         this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
         this.props.setEdited(false);
         if (response.result !== "successful") {

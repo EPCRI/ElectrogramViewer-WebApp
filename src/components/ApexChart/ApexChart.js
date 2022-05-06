@@ -47,7 +47,10 @@ const initialData = {
 
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
-  scrollButtonCheck(event);
+  console.log(`Clicked ${event.native.which === 1 ? 'right' : 'left'} mouse button`);
+  if (event.native.which === 1) {
+    scrollButtonCheck(event);
+  }
 }
 
 function scrollButtonCheck(event) {
@@ -135,6 +138,7 @@ export const options = {
   animation: false,
   interaction: {
   },
+  events: ["click", "mousemove"],
   ecgColors: ['maroon', 'black', 'red', 'blue', 'black', 'green', 'red', 'orange', 'green', 'brown', 'black', 'purple'],
   completeDataset: {
     datasets: [],
@@ -259,6 +263,21 @@ class ApexChart extends React.Component {
       zoom_value: 2,
     };
     this.handleZoomChange = this.handleZoomChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      console.log(e);
+      const corsair = options.plugins.corsair;
+      if(corsair.drawingLine) {
+        corsair.annotating = false;
+        corsair.drawingLine = false;
+        console.log("Adding");
+        console.log("Length: " + corsair.annotations.length);
+        this.props.setEdited(true);
+        this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
+      }
+    })
   }
 
   updateAnnotations() {
@@ -379,10 +398,14 @@ class ApexChart extends React.Component {
     this.myChartRef.current.update('none');
   }
 
+  handleClick(event) {
+    console.log(event);
+  }
+
   render() {
     return (
       <div className={styles.chartcontainer} >
-        <div style={this.props.loaderVisible ? {visibility: "hidden"} : {visibility: "visible", height: '100%', width: '100%'}}>
+        <div onClick={this.handleClick} style={this.props.loaderVisible ? {visibility: "hidden"} : {visibility: "visible", height: '100%', width: '100%'}}>
           <Line 
             ref={this.myChartRef}
             height={"100%"} 
