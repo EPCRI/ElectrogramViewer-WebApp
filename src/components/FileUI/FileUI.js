@@ -7,7 +7,7 @@ class FileUI extends React.Component {
         super(props);
         this.state = {
             files: [],
-            formFileIdx: 0,
+            formFileIdx: this.props.currentFileIdx,
             AVD: '-',
             VVD: '-',
             IVD: '-',
@@ -76,6 +76,7 @@ class FileUI extends React.Component {
     handleChange(event) {
         event.preventDefault();
         const fileIdx = event.target.value
+        console.log(fileIdx);
         this.setState({formFileIdx: fileIdx});
     }
 
@@ -92,6 +93,8 @@ class FileUI extends React.Component {
         event.preventDefault();
         const fileIdx = parseInt(this.props.currentFileIdx);
         const newFileIdx = fileIdx + 1;
+        console.log(newFileIdx);
+        this.setState({formFileIdx: newFileIdx});
         this.props.changeFile(newFileIdx);
         this.props.setFileWasUpdated(true);
         this.props.setLoaderVisible(true);
@@ -116,7 +119,7 @@ class FileUI extends React.Component {
                 <div className={styles['file-input-wrapper']}>
                     <div>
                         <div className={styles['file-interface']}>
-                            <select styles={{width: "20%"}} value={this.props.currentFileIdx} onChange={this.handleChange}>
+                            <select styles={{width: "20%"}} value={this.state.formFileIdx} onChange={this.handleChange}>
                                 {this.annotationOptions()}
                             </select>
                             <button onClick={this.handleLoad}>Load</button>
