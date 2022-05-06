@@ -430,7 +430,6 @@ class ApexChart extends React.Component {
             <button className={styles['confirm-buttons']} onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
               if(corsair.drawingLine) {
-                corsair.annotating = false;
                 corsair.drawingLine = false;
                 console.log("Adding");
                 console.log("Length: " + corsair.annotations.length);
