@@ -192,7 +192,7 @@ export const options = {
     corsair: {
       annotations: [],
       drawingLine: false,
-      annotating: false,
+      annotating: true,
       draw: true,
       color: 'red',
       dash: [],
@@ -270,7 +270,7 @@ class ApexChart extends React.Component {
       console.log(e);
       const corsair = options.plugins.corsair;
       if(corsair.drawingLine) {
-        corsair.annotating = false;
+        // corsair.annotating = false;
         corsair.drawingLine = false;
         console.log("Adding");
         console.log("Length: " + corsair.annotations.length);
