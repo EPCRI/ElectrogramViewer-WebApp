@@ -154,8 +154,8 @@ class FileUI extends React.Component {
                 <div style={{margin: '.5vw', paddingLeft: '10vw', fontSize: 'larger', color: 'orange'}}>
                     {this.props.annotations.length} / 3 Annotations
                 </div>
-                <div style={{right: '2vw', position: 'absolute', fontSize: 'larger'}}>
-                    {this.props.edited ? <div></div> : <div style={{color: 'green'}}>SAVED</div>}
+                <div style={{right: '2vw', position: 'absolute', fontSize: 'xx-large'}}>
+                    {this.props.edited ? <div></div> : <div style={{color: 'green'}}>💾</div>}
                 </div>
             </div>
         )
