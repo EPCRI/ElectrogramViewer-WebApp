@@ -309,6 +309,7 @@ class ApexChart extends React.Component {
 
   async updateChartFile () {
     console.log('updateChartFile()');
+    this.props.setEdited(true);
     options.electrogramParams.dataIdxLeft = 0;
     options.electrogramParams.dataIdxRight = 10000;
     options.electrogramParams.numPointsOnChart = 10000;
