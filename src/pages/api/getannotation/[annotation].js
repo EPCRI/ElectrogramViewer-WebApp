@@ -10,10 +10,14 @@ export default function handler(req, res) {
     getFileNames([], (recordings) => {
         getAnnotationNames([], (annotations) => {
             console.log("HERE: " + annotation);
+            console.log(annotations);
             const parsedFileIdx = parseInt(annotation);
             if (parsedFileIdx !== undefined && !isNaN(parsedFileIdx) && parsedFileIdx < recordings.length) {
-                const file = recordings[parsedFileIdx];
+                let file = recordings[parsedFileIdx];
+                console.log(file);
                 if (annotations.includes(file)) {
+                    console.log("HERE");
+                    file = file.replace(".json", "_annotation.json");
                     fs.readFile(annotationPath + file, (err, data) => {
                         if (err) throw err;
                         let annotationData = JSON.parse(data);

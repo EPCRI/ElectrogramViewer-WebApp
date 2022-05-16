@@ -15,7 +15,8 @@ export default function handler(req, res) {
             getFileNames([], (files) => {
                 const parsedFileIdx = parseInt(annotationFileIdx);
                 if (parsedFileIdx !== undefined && !isNaN(parsedFileIdx) && parsedFileIdx < files.length) {
-                    const file = files[parsedFileIdx];
+                    let file = files[parsedFileIdx];
+                    file = file.replace(".json", "_annotation.json");
                     console.log(annotationPath + file);
                     body.filename = file;
                     fs.writeFile(annotationPath + file, JSON.stringify(body), (err) => {
