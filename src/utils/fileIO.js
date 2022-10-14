@@ -67,10 +67,12 @@ export const getAnnotationData = async (fileIdx) => {
     return data;
 }
 
-export const saveAnnotationData = async (fileIdx, annotations) => {
+export const saveAnnotationData = async (fileIdx, annotations, flagged, fileName) => {
     const obj = {
         fileIdx,
-        annotations
+        annotations,
+        flagged,
+        fileName
     };
     console.log("saveAnnotationData()");
     const response = await fetch(server + "/postannotation", {

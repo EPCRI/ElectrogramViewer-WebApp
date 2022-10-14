@@ -16,9 +16,21 @@ export default function handler(req, res) {
                 let file = recordings[parsedFileIdx];
                 console.log(file);
                 if (annotations.includes(file)) {
-                    console.log("HERE");
                     file = file.replace(".json", "_annotation.json");
                     fs.readFile(annotationPath + file, (err, data) => {
+                        if (err) throw err;
+                        let annotationData = JSON.parse(data);
+                        res.status(200).json({
+                            method: 'GET', 
+                            endpoint: 'getannotation',
+                            fileExists: true,
+                            fileName: file,
+                            data: annotationData
+                        });
+                    });
+                }else if(annotations.includes("FLAG_" + file)) {
+                    file = file.replace(".json", "_annotation.json");
+                    fs.readFile(annotationPath + "FLAG_" + file, (err, data) => {
                         if (err) throw err;
                         let annotationData = JSON.parse(data);
                         res.status(200).json({

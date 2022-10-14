@@ -21,6 +21,7 @@ class Viewer extends React.Component {
     this.addComment = this.addComment.bind(this);
     this.addAnnotation = this.addAnnotation.bind(this);
     this.addAnnotationFile = this.addAnnotationFile.bind(this);
+    this.removeAnnotationFile = this.removeAnnotationFile.bind(this);
     this.removeAnnotation = this.removeAnnotation.bind(this);
     this.changeFile = this.changeFile.bind(this);
     this.setFileWasUpdated = this.setFileWasUpdated.bind(this);
@@ -44,6 +45,14 @@ class Viewer extends React.Component {
     const annArr = this.state.annotationFiles;
     annArr.push(file);
     this.setState({annotationFiles: annArr});
+  }
+
+  removeAnnotationFile(file) {
+    const annArr = this.state.annotationFiles;
+    console.log(annArr);
+    const updatedAnnArr = annArr.filter(e => e !== file);
+    console.log(updatedAnnArr);
+    this.setState({annotationFiles: updatedAnnArr});
   }
 
   addAnnotation (annotation) {
@@ -100,6 +109,7 @@ class Viewer extends React.Component {
         <FileUI 
           annotations={this.state.annotations}
           addAnnotationFile={this.addAnnotationFile}
+          removeAnnotationFile={this.removeAnnotationFile}
           changeFile={this.changeFile}
           setLoaderVisible={this.setLoaderVisible}
           loaderVisible={this.state.loaderVisible}

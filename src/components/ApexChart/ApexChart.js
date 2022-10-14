@@ -286,25 +286,33 @@ class ApexChart extends React.Component {
 
   async componentDidMount() {
     // console.log('componentDidMount()');
-    window.setTimeout(() => {
-      this.updateAnnotations();
-      this.updateChartFile();
-      this.props.setFileWasUpdated(false);
-      this.myChartRef.current.update('none');
-    })
+    window.setTimeout(
+      function() {
+        this.updateAnnotations();
+        this.updateChartFile();
+        this.props.setFileWasUpdated(false);
+        this.myChartRef.current.update('none');
+      }
+      .bind(this),
+      500
+    );
   }
 
   async componentDidUpdate() {
     // console.log('componentDidUpdate()');
-    window.setTimeout(() => {
-      this.updateAnnotations();
-      if (this.props.fileWasUpdated) { 
-        this.props.setFileWasUpdated(false);
-        console.log("File was Updated");
-        this.updateChartFile(); 
+    window.setTimeout(
+      function() {
+        this.updateAnnotations();
+        if (this.props.fileWasUpdated) { 
+          this.props.setFileWasUpdated(false);
+          console.log("File was Updated");
+          this.updateChartFile(); 
+        }
+        this.myChartRef.current.update('none');
       }
-      this.myChartRef.current.update('none');
-    })
+      .bind(this),
+      500
+    );
   }
 
   async updateChartFile () {

@@ -20,6 +20,7 @@ class FileUI extends React.Component {
         this.handleLoad = this.handleLoad.bind(this);
         this.handleSave = this.handleSave.bind(this);
         this.handleNext = this.handleNext.bind(this);
+        this.handleFlag = this.handleFlag.bind(this);
     }
 
     async componentDidMount() {
@@ -34,11 +35,15 @@ class FileUI extends React.Component {
 
     annotationOptions() {
         const annotationFiles = this.props.annotationFiles;
+        console.log("Annotation Files");
+        console.log(annotationFiles);
         let optionsArr = [];
         if (this.state.files.length > 0) {
             optionsArr = this.state.files.map((file, index) => {
                 if (annotationFiles.includes(file)) {
-                    return <option style={{backgroundColor: 'lightgreen'}} key={index} value={index}>{file}</option>
+                    return <option style={{backgroundColor: 'lightred'}} key={index} value={index}>{file}</option>
+                } else if (annotationFiles.includes("FLAG_" + file)) {
+                    return <option style={{backgroundColor: 'red'}} key={index} value={index}>{file}</option>
                 } else {
                     return <option key={index} value={index}>{file}</option>
                 }
@@ -102,10 +107,37 @@ class FileUI extends React.Component {
         this.parseFileName(this.state.files[fileIdx]);
     }
 
+    async handleFlag(event) {
+        event.preventDefault();
+        const annotationFiles = this.props.annotationFiles;
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, true);
+        if(annotationFiles && annotationFiles.includes(this.state.files[this.props.currentFileIdx]))
+            this.props.removeAnnotationFile(this.state.files[this.props.currentFileIdx]);
+        if(annotationFiles && !annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
+            this.props.addAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
+        this.props.setEdited(false);
+        if (response.result !== "successful") {
+            alert("Something went wrong");
+        }
+        event.preventDefault();
+        const fileIdx = parseInt(this.props.currentFileIdx);
+        const newFileIdx = fileIdx + 1;
+        console.log(newFileIdx);
+        this.setState({formFileIdx: newFileIdx});
+        this.props.changeFile(newFileIdx);
+        this.props.setFileWasUpdated(true);
+        this.props.setLoaderVisible(true);
+        this.parseFileName(this.state.files[fileIdx]);
+    }
+
     async handleSave(event) {
         event.preventDefault();
-        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations);
-        this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
+        const annotationFiles = this.props.annotationFiles;
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, false);
+        if(annotationFiles && annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
+            this.props.removeAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
+        if(annotationFiles && !annotationFiles.includes(this.state.files[this.props.currentFileIdx]))
+            this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
         this.props.setEdited(false);
         if (response.result !== "successful") {
             alert("Something went wrong");
@@ -123,7 +155,8 @@ class FileUI extends React.Component {
                             </select>
                             <button onClick={this.handleLoad}>Load</button>
                             <button onClick={this.handleSave}>Save</button>
-                            <button onClick={this.handleNext}>Next</button>
+                            <button onClick={this.handleNext}>Save + Next</button>
+                            <button onClick={this.handleFlag}>Flag + Next</button>
                         </div>
                     </div>
                 </div>
