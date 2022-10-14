@@ -41,7 +41,7 @@ class FileUI extends React.Component {
         if (this.state.files.length > 0) {
             optionsArr = this.state.files.map((file, index) => {
                 if (annotationFiles.includes(file)) {
-                    return <option style={{backgroundColor: 'lightred'}} key={index} value={index}>{file}</option>
+                    return <option style={{backgroundColor: 'lightgreen'}} key={index} value={index}>{file}</option>
                 } else if (annotationFiles.includes("FLAG_" + file)) {
                     return <option style={{backgroundColor: 'red'}} key={index} value={index}>{file}</option>
                 } else {
