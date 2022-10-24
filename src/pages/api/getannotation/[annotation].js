@@ -10,7 +10,6 @@ export default function handler(req, res) {
     getFileNames([], (recordings) => {
         getAnnotationNames([], (annotations) => {
             console.log("HERE: " + annotation);
-            console.log(annotations);
             const parsedFileIdx = parseInt(annotation);
             if (parsedFileIdx !== undefined && !isNaN(parsedFileIdx) && parsedFileIdx < recordings.length) {
                 let file = recordings[parsedFileIdx];

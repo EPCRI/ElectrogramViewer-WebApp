@@ -21,6 +21,7 @@ class FileUI extends React.Component {
         this.handleSave = this.handleSave.bind(this);
         this.handleNext = this.handleNext.bind(this);
         this.handleFlag = this.handleFlag.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     async componentDidMount() {
@@ -36,16 +37,15 @@ class FileUI extends React.Component {
     annotationOptions() {
         const annotationFiles = this.props.annotationFiles;
         console.log("Annotation Files");
-        console.log(annotationFiles);
         let optionsArr = [];
         if (this.state.files.length > 0) {
             optionsArr = this.state.files.map((file, index) => {
                 if (annotationFiles.includes(file)) {
-                    return <option style={{backgroundColor: 'lightgreen'}} key={index} value={index}>{file}</option>
+                    return <option style={{backgroundColor: 'lightgreen'}} key={index} value={index}>{index + 1 + ': ' + file}</option>
                 } else if (annotationFiles.includes("FLAG_" + file)) {
-                    return <option style={{backgroundColor: 'red'}} key={index} value={index}>{file}</option>
+                    return <option style={{backgroundColor: 'red'}} key={index} value={index}>{index + 1 + ': ' + file}</option>
                 } else {
-                    return <option key={index} value={index}>{file}</option>
+                    return <option key={index} value={index}>{index + 1 + ': ' + file}</option>
                 }
             })
         }
@@ -95,8 +95,13 @@ class FileUI extends React.Component {
     }
 
     async handleNext(event) {
-        await this.handleSave(event);
         event.preventDefault();
+        if (this.props.annotations.length < 3) {
+            let needed = 3 - this.props.annotations.length;
+            alert("Complete " + needed + " more tracings before continuing");
+            return
+        }
+        await this.handleSave(event);
         const fileIdx = parseInt(this.props.currentFileIdx);
         const newFileIdx = fileIdx + 1;
         console.log(newFileIdx);
@@ -110,15 +115,14 @@ class FileUI extends React.Component {
     async handleFlag(event) {
         event.preventDefault();
         const annotationFiles = this.props.annotationFiles;
-        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, true);
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, "FLAG");
+        if (response.result !== "successful")
+            alert("Something went wrong");
         if(annotationFiles && annotationFiles.includes(this.state.files[this.props.currentFileIdx]))
             this.props.removeAnnotationFile(this.state.files[this.props.currentFileIdx]);
         if(annotationFiles && !annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
             this.props.addAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
         this.props.setEdited(false);
-        if (response.result !== "successful") {
-            alert("Something went wrong");
-        }
         event.preventDefault();
         const fileIdx = parseInt(this.props.currentFileIdx);
         const newFileIdx = fileIdx + 1;
@@ -132,16 +136,37 @@ class FileUI extends React.Component {
 
     async handleSave(event) {
         event.preventDefault();
+        if (this.props.annotations.length < 3) {
+            let needed = 3 - this.props.annotations.length;
+            alert("Complete " + needed + " more tracings before continuing");
+            return
+        }
         const annotationFiles = this.props.annotationFiles;
-        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, false);
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, "SAVE");
+        if (response.result !== "successful")
+            alert("Something went wrong");
+        if(annotationFiles && annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx])){
+            console.log("1");
+            this.props.removeAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
+        }
+        if(annotationFiles && !annotationFiles.includes(this.state.files[this.props.currentFileIdx])){
+            console.log("2");
+            this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
+        }
+        this.props.setEdited(false);
+    }
+
+    async handleDelete(event) {
+        event.preventDefault();
+        const annotationFiles = this.props.annotationFiles;
+        const response = await saveAnnotationData(this.props.currentFileIdx, this.props.annotations, "DELETE");
+        if (response.result !== "successful")
+            alert("Something went wrong");
+        if(annotationFiles && annotationFiles.includes(this.state.files[this.props.currentFileIdx]))
+            this.props.removeAnnotationFile(this.state.files[this.props.currentFileIdx]);
         if(annotationFiles && annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
             this.props.removeAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
-        if(annotationFiles && !annotationFiles.includes(this.state.files[this.props.currentFileIdx]))
-            this.props.addAnnotationFile(this.state.files[this.props.currentFileIdx]);
-        this.props.setEdited(false);
-        if (response.result !== "successful") {
-            alert("Something went wrong");
-        }
+        this.handleLoad(event);
     }
 
     render() {
@@ -155,8 +180,9 @@ class FileUI extends React.Component {
                             </select>
                             <button onClick={this.handleLoad}>Load</button>
                             <button onClick={this.handleSave}>Save</button>
-                            <button onClick={this.handleNext}>Save + Next</button>
+                            <button onClick={this.handleDelete}>Delete</button>
                             <button onClick={this.handleFlag}>Flag + Next</button>
+                            <button onClick={this.handleNext}>Save + Next</button>
                         </div>
                     </div>
                 </div>

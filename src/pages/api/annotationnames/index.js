@@ -21,7 +21,6 @@ export default function handler(req, res) {
           case 'GET':
             const { query: { id } } = req;
             getAnnotationNames([], (annotationfiles) => {
-                console.log(annotationfiles);
                 res.status(200).json({
                     method: 'GET', 
                     endpoint: 'annotationnames',
