@@ -22,6 +22,7 @@ class FileUI extends React.Component {
         this.handleNext = this.handleNext.bind(this);
         this.handleFlag = this.handleFlag.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.loadNextFile = this.loadNextFile.bind(this);
     }
 
     async componentDidMount() {
@@ -94,14 +95,7 @@ class FileUI extends React.Component {
         this.parseFileName(this.state.files[fileIdx]);
     }
 
-    async handleNext(event) {
-        event.preventDefault();
-        if (this.props.annotations.length < 3) {
-            let needed = 3 - this.props.annotations.length;
-            alert("Complete " + needed + " more tracings before continuing");
-            return
-        }
-        await this.handleSave(event);
+    loadNextFile() {
         const fileIdx = parseInt(this.props.currentFileIdx);
         const newFileIdx = fileIdx + 1;
         console.log(newFileIdx);
@@ -110,6 +104,17 @@ class FileUI extends React.Component {
         this.props.setFileWasUpdated(true);
         this.props.setLoaderVisible(true);
         this.parseFileName(this.state.files[fileIdx]);
+    }
+
+    async handleNext(event) {
+        event.preventDefault();
+        if (this.props.annotations.length < 3) {
+            let needed = 3 - this.props.annotations.length;
+            alert("Complete " + needed + " more tracings before continuing");
+            return
+        }
+        await this.handleSave(event);
+        this.loadNextFile();
     }
 
     async handleFlag(event) {
@@ -123,15 +128,7 @@ class FileUI extends React.Component {
         if(annotationFiles && !annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
             this.props.addAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
         this.props.setEdited(false);
-        event.preventDefault();
-        const fileIdx = parseInt(this.props.currentFileIdx);
-        const newFileIdx = fileIdx + 1;
-        console.log(newFileIdx);
-        this.setState({formFileIdx: newFileIdx});
-        this.props.changeFile(newFileIdx);
-        this.props.setFileWasUpdated(true);
-        this.props.setLoaderVisible(true);
-        this.parseFileName(this.state.files[fileIdx]);
+        this.loadNextFile();
     }
 
     async handleSave(event) {
@@ -166,7 +163,7 @@ class FileUI extends React.Component {
             this.props.removeAnnotationFile(this.state.files[this.props.currentFileIdx]);
         if(annotationFiles && annotationFiles.includes("FLAG_" + this.state.files[this.props.currentFileIdx]))
             this.props.removeAnnotationFile("FLAG_" + this.state.files[this.props.currentFileIdx]);
-        this.handleLoad(event);
+        this.loadNextFile();
     }
 
     render() {
@@ -180,7 +177,7 @@ class FileUI extends React.Component {
                             </select>
                             <button onClick={this.handleLoad}>Load</button>
                             <button onClick={this.handleSave}>Save</button>
-                            <button onClick={this.handleDelete}>Delete</button>
+                            <button onClick={this.handleDelete}>Delete + Next</button>
                             <button onClick={this.handleFlag}>Flag + Next</button>
                             <button onClick={this.handleNext}>Save + Next</button>
                         </div>
