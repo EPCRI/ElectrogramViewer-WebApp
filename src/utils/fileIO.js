@@ -1,6 +1,10 @@
 
+// const server = "https://ecgviewer-api.com";
+// const server = "http://localhost:3000";
+const server = "/api";
+
 export const getFileNames = async () => {
-    const response = await fetch("/api/filenames", {
+    const response = await fetch(server + "/filenames", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -16,7 +20,7 @@ export const getFileNames = async () => {
 }
 
 export const getFileData = async (fileIdx) => {
-    const response = await fetch("/api/file/" + fileIdx, {
+    const response = await fetch(server + "/file/" + fileIdx, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -32,7 +36,7 @@ export const getFileData = async (fileIdx) => {
 }
 
 export const getAnnotationNames = async () => {
-    const response = await fetch("/api/annotationnames", {
+    const response = await fetch(server + "/annotationnames", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -48,7 +52,7 @@ export const getAnnotationNames = async () => {
 }
 
 export const getAnnotationData = async (fileIdx) => {
-    const response = await fetch("/api/getannotation/" + fileIdx, {
+    const response = await fetch(server + "/getannotation/" + fileIdx, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -63,13 +67,14 @@ export const getAnnotationData = async (fileIdx) => {
     return data;
 }
 
-export const saveAnnotationData = async (fileIdx, annotations) => {
+export const saveAnnotationData = async (fileIdx, annotations, call) => {
     const obj = {
         fileIdx,
-        annotations
+        annotations,
+        call
     };
-    console.log("saveAnnotationData()");
-    const response = await fetch("/api/postannotation", {
+    console.log("saveAnnotationData() ".concat(call));
+    const response = await fetch(server + "/postannotation", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

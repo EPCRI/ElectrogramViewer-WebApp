@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { BallTriangle } from  'react-loader-spinner';
 import { getFileData, getAnnotationData } from '../../utils/fileIO';
 import annotationLinePlugin, { AnnotationLine } from '../../plugins/annotationline';
 import movechart from '../../plugins/movechart';
@@ -46,7 +47,10 @@ const initialData = {
 
 function mouseClickFunction(event) {
   console.log("mouseClickFunction()");
-  scrollButtonCheck(event);
+  console.log(`Clicked ${event.native.which === 1 ? 'right' : 'left'} mouse button`);
+  if (event.native.which === 1) {
+    scrollButtonCheck(event);
+  }
 }
 
 function scrollButtonCheck(event) {
@@ -134,6 +138,7 @@ export const options = {
   animation: false,
   interaction: {
   },
+  events: ["click", "mousemove"],
   ecgColors: ['maroon', 'black', 'red', 'blue', 'black', 'green', 'red', 'orange', 'green', 'brown', 'black', 'purple'],
   completeDataset: {
     datasets: [],
@@ -187,7 +192,7 @@ export const options = {
     corsair: {
       annotations: [],
       drawingLine: false,
-      annotating: false,
+      annotating: true,
       draw: true,
       color: 'red',
       dash: [],
@@ -258,6 +263,21 @@ class ApexChart extends React.Component {
       zoom_value: 2,
     };
     this.handleZoomChange = this.handleZoomChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      console.log(e);
+      const corsair = options.plugins.corsair;
+      if(corsair.drawingLine) {
+        // corsair.annotating = false;
+        corsair.drawingLine = false;
+        console.log("Adding");
+        console.log("Length: " + corsair.annotations.length);
+        this.props.setEdited(true);
+        this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
+      }
+    })
   }
 
   updateAnnotations() {
@@ -265,30 +285,39 @@ class ApexChart extends React.Component {
   }
 
   async componentDidMount() {
-    console.log('componentDidMount()');
-    window.setTimeout(() => {
-      this.updateAnnotations();
-      this.updateChartFile();
-      this.props.setFileWasUpdated(false);
-      this.myChartRef.current.update('none');
-    })
+    // console.log('componentDidMount()');
+    window.setTimeout(
+      function() {
+        this.updateAnnotations();
+        this.updateChartFile();
+        this.props.setFileWasUpdated(false);
+        this.myChartRef.current.update('none');
+      }
+      .bind(this),
+      500
+    );
   }
 
   async componentDidUpdate() {
     // console.log('componentDidUpdate()');
-    window.setTimeout(() => {
-      this.updateAnnotations();
-      if (this.props.fileWasUpdated) { 
-        this.props.setFileWasUpdated(false);
-        console.log("File was Updated");
-        this.updateChartFile(); 
+    window.setTimeout(
+      function() {
+        this.updateAnnotations();
+        if (this.props.fileWasUpdated) { 
+          this.props.setFileWasUpdated(false);
+          console.log("File was Updated");
+          this.updateChartFile(); 
+        }
+        this.myChartRef.current.update('none');
       }
-      this.myChartRef.current.update('none');
-    })
+      .bind(this),
+      500
+    );
   }
 
   async updateChartFile () {
     console.log('updateChartFile()');
+    this.props.setEdited(true);
     options.electrogramParams.dataIdxLeft = 0;
     options.electrogramParams.dataIdxRight = 10000;
     options.electrogramParams.numPointsOnChart = 10000;
@@ -301,9 +330,13 @@ class ApexChart extends React.Component {
       this.myChartRef.current.config.data = currentSliceData;
 
       // update annotations
+      console.log("getAnnotationData()");
       let jsonData = await getAnnotationData(this.props.currentFileIdx);
+      console.log("got annotation jsonData");
+      console.log(jsonData);
       let annotations = [];
-      if (jsonData.fileExists) { 
+      if (jsonData && jsonData.fileExists) {
+        console.log("annotation file exists");
         let annotationJSON = jsonData.data.annotations;
         annotationJSON.forEach(element => {
           const loadedAnnotations = new AnnotationLine(
@@ -319,8 +352,9 @@ class ApexChart extends React.Component {
         })
       }
       options.plugins.corsair.annotations = annotations;
-
       this.myChartRef.current.update('none');
+      console.log("CHART UPDATED");
+      this.props.setLoaderVisible(false);
     } catch (err) {
       console.log(err);
     }
@@ -374,10 +408,14 @@ class ApexChart extends React.Component {
     this.myChartRef.current.update('none');
   }
 
+  handleClick(event) {
+    console.log(event);
+  }
+
   render() {
     return (
-      <div className={styles.chartcontainer}>
-        <div style={{height: '100%', width: '100%'}}>
+      <div className={styles.chartcontainer} >
+        <div onClick={this.handleClick} style={this.props.loaderVisible ? {visibility: "hidden"} : {visibility: "visible", height: '100%', width: '100%'}}>
           <Line 
             ref={this.myChartRef}
             height={"100%"} 
@@ -393,20 +431,19 @@ class ApexChart extends React.Component {
             <option value={2}>100</option>
             <option value={1}>67</option>
           </select>
-          <div className={styles['tools-box-name']}>Window</div>
+          <div className={styles['tools-box-name']}></div>
           <button className={styles['select-buttons']} onClick={() => {
             this.myChartRef.current.config.options.plugins.corsair.annotating = true;
             console.log(this.myChartRef.current.config.options.plugins.corsair);
-            }}>T1</button>
-          <button className={styles['select-buttons']}>T2</button>
+            }}>✎</button>
           <div>
             <button className={styles['confirm-buttons']} onClick={() => {
               const corsair = this.myChartRef.current.config.options.plugins.corsair;
               if(corsair.drawingLine) {
-                corsair.annotating = false;
                 corsair.drawingLine = false;
                 console.log("Adding");
                 console.log("Length: " + corsair.annotations.length);
+                this.props.setEdited(true);
                 this.props.addAnnotation(corsair.annotations[corsair.annotations.length - 1]);
               }
             }}>✓</button>
@@ -420,13 +457,17 @@ class ApexChart extends React.Component {
               }
             }}>☓</button>
           </div>
-          {/* <div className='tools-box-name'>Point</div>
-          <button className='select-buttons'>✎</button>
-          <div>
-            <button className='confirm-buttons'>✓</button>
-            <button className='confirm-buttons'>☓</button>
-          </div> */}
         </div>
+        {this.props.loaderVisible &&
+            <div className={styles['loading-icon']}>
+              <BallTriangle
+                height="70"
+                width="70"
+                color="grey"
+                ariaLabel="loading-indicator"
+              />
+            </div>
+          }
       </div>
     );
   }

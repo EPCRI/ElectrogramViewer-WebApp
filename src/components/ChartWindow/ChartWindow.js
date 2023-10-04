@@ -2,6 +2,7 @@ import React from "react";
 import styles from './ChartWindow.module.css';
 import ApexChart from '../ApexChart/ApexChart';
 import { Annotation } from '../Annotation/Annotation';
+import { ThrowStatement } from "requirejs";
 
 const traceLeads = ['I','II','III','aVR','aVL','aVF','V1','V2','V3','V4','V5','V6'];
 
@@ -27,15 +28,10 @@ class ChartWindow extends React.Component {
               addAnnotation={this.props.addAnnotation}
               currentFileIdx={this.props.currentFileIdx}
               fileWasUpdated={this.props.fileWasUpdated}
-              setFileWasUpdated={this.props.setFileWasUpdated}/>
-          </div>
-          <div className={`${styles.column} ${styles.right}`}>
-            {this.props.annotations.map((element, index) => (
-              <Annotation 
-                key={index}
-                annotation={element} 
-                removeAnnotation={this.props.removeAnnotation}
-                addComment={this.props.addComment}/>))}
+              setFileWasUpdated={this.props.setFileWasUpdated}
+              loaderVisible={this.props.loaderVisible}
+              setLoaderVisible={this.props.setLoaderVisible}
+              setEdited={this.props.setEdited}/>
           </div>
         </div>
       );

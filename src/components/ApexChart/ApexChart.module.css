@@ -19,13 +19,21 @@
   text-decoration: underline;
   font-size: small;
   text-align: center;
+  margin: 8px;
 }
 
 .select-buttons {
   width: 50px;
+  background-color: cyan;
 }
 
 .confirm-buttons {
   width: 25px;
   text-align: center;
+}
+
+.loading-icon {
+  position: absolute;
+  top: 40%;
+  right: 50%;
 }
